@@ -29,10 +29,10 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/jonjohnsonjr/dagdotdev/internal/forks/elf"
 	"github.com/jonjohnsonjr/dagdotdev/internal/forks/safefilepath"
 	"github.com/jonjohnsonjr/dagdotdev/internal/xxd"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"golang.org/x/exp/slices"
 )
 
@@ -481,6 +481,9 @@ func tarListAll(i int, dirs anyDirs, fi fs.FileInfo, u url.URL, uprefix, fprefix
 	header, ok := fi.Sys().(*tar.Header)
 	if !ok {
 		name := fi.Name()
+		if fi.IsDir() {
+			name += "/"
+		}
 		ts := "????-??-?? ??:??"
 		ug := "?/?"
 		mode := "d?????????"
@@ -496,6 +499,9 @@ func tarListAll(i int, dirs anyDirs, fi fs.FileInfo, u url.URL, uprefix, fprefix
 	s := fmt.Sprintf("%s %s <span title=%q>%*d</span> %s", mode, ug, humanize.IBytes(uint64(header.Size)), padding, header.Size, ts)
 
 	name := dirs.name(i)
+	if dirs.isDir(i) {
+		name += "/"
+	}
 	if header.Linkname != "" {
 		if header.Linkname == "." {
 			u.Path = path.Dir(u.Path)
@@ -535,6 +541,9 @@ func tarList(i int, dirs anyDirs, showlayer bool, fi fs.FileInfo, u url.URL, upr
 	header, ok := fi.Sys().(*tar.Header)
 	if !ok {
 		name := fi.Name()
+		if fi.IsDir() {
+			name += "/"
+		}
 		ts := "????-??-?? ??:??"
 		ug := "?/?"
 		mode := "d?????????"
@@ -564,6 +573,9 @@ func tarList(i int, dirs anyDirs, showlayer bool, fi fs.FileInfo, u url.URL, upr
 		s = prefix + " " + s
 	}
 	name := fi.Name()
+	if fi.IsDir() {
+		name += "/"
+	}
 	if header.Linkname != "" {
 		if header.Linkname == "." {
 			u.Path = path.Dir(u.Path)
@@ -615,6 +627,9 @@ func tarListSize(i int, dirs anyDirs, showlayer bool, fi fs.FileInfo, u url.URL,
 	header, ok := fi.Sys().(*tar.Header)
 	if !ok {
 		name := fi.Name()
+		if fi.IsDir() {
+			name += "/"
+		}
 		ts := "????-??-?? ??:??"
 		ug := "?/?"
 		mode := "d?????????"
@@ -647,6 +662,9 @@ func tarListSize(i int, dirs anyDirs, showlayer bool, fi fs.FileInfo, u url.URL,
 		s = fmt.Sprintf("<small>%*s</small> ", ownerLength, owner) + s
 	}
 	name := dirs.name(i)
+	if dirs.isDir(i) {
+		name += "/"
+	}
 	if header.Linkname != "" {
 		if header.Linkname == "." {
 			u.Path = path.Dir(u.Path)
@@ -692,6 +710,9 @@ func TarList(fi fs.FileInfo, u url.URL, uprefix string) string {
 	header, ok := fi.Sys().(*tar.Header)
 	if !ok {
 		name := fi.Name()
+		if fi.IsDir() {
+			name += "/"
+		}
 		ts := "????-??-?? ??:??"
 		ug := "?/?"
 		mode := "d?????????"
@@ -706,6 +727,9 @@ func TarList(fi fs.FileInfo, u url.URL, uprefix string) string {
 	padding := 18 - len(ug)
 	s := fmt.Sprintf("%s %s <span title=%q>%*d</span> %s", mode, ug, humanize.IBytes(uint64(header.Size)), padding, header.Size, ts)
 	name := fi.Name()
+	if fi.IsDir() {
+		name += "/"
+	}
 	if header.Linkname != "" {
 		if header.Linkname == "." {
 			u.Path = path.Dir(u.Path)

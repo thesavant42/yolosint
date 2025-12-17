@@ -11,10 +11,10 @@ import (
 
 	kzstd "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/zstd"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/jonjohnsonjr/dagdotdev/internal/and"
 	"github.com/jonjohnsonjr/dagdotdev/internal/gzip"
 	"github.com/jonjohnsonjr/dagdotdev/internal/zstd"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 )
 
 const (
@@ -35,11 +35,11 @@ type PeekReader interface {
 // zstd
 func Peek(rc io.ReadCloser) (string, io.ReadCloser, io.ReadCloser, error) {
 	logs.Debug.Printf("Peek")
-	buf := bufio.NewReaderSize(rc, 1<<16)
+	buf := bufio.NewReaderSize(rc, 1<<18)
 	pr := &and.ReadCloser{Reader: buf, CloseFunc: rc.Close}
 
 	// Should be enough to read first block?
-	zb, err := buf.Peek(1 << 16)
+	zb, err := buf.Peek(1 << 18)
 	if err != nil {
 		if err != io.EOF {
 			return "", pr, nil, fmt.Errorf("buf.Peek: %w", err)
