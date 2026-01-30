@@ -273,7 +273,6 @@ func (h *handler) renderRepo(w http.ResponseWriter, r *http.Request, repo string
 	header := HeaderData{
 		Repo:      repo,
 		Reference: repo,
-		JQ:        crane("ls") + " " + repo,
 	}
 	if strings.Contains(repo, "/") || (ref.RegistryStr() == name.DefaultRegistry || ref.RegistryStr() == "docker.io") {
 		fullRepo := path.Join(ref.RegistryStr(), ref.RepositoryStr())
@@ -341,15 +340,6 @@ func (h *handler) renderGoogleRepo(w http.ResponseWriter, r *http.Request, repo 
 	header := HeaderData{
 		Repo:      repo,
 		Reference: repo,
-		JQ:        gcrane + " ls --json " + repo + " | jq .",
-	}
-	if ref.RepositoryStr() == "" {
-		uri := &url.URL{
-			Scheme: ref.Registry.Scheme(),
-			Host:   ref.Registry.RegistryStr(),
-			Path:   "/v2/tags/list",
-		}
-		header.JQ = fmt.Sprintf("curl -sL %q | jq .", uri.String())
 	}
 	if strings.Contains(repo, "/") {
 		base := path.Base(repo)
@@ -413,7 +403,6 @@ func (h *handler) renderDockerHub(w http.ResponseWriter, r *http.Request, repo s
 	header := HeaderData{
 		Repo:      repo,
 		Reference: repo,
-		JQ:        fmt.Sprintf("curl -sL %q | jq .", nextUri),
 	}
 
 	if strings.Contains(repo, "/") {
@@ -472,7 +461,6 @@ func (h *handler) renderCatalog(w http.ResponseWriter, r *http.Request, repo str
 	header := HeaderData{
 		Repo:      repo,
 		Reference: repo,
-		JQ:        crane("catalog") + " " + repo,
 	}
 	if err := bodyTmpl.Execute(w, header); err != nil {
 		return err
@@ -543,17 +531,6 @@ func (h *handler) renderManifest(w http.ResponseWriter, r *http.Request, image s
 	b, err := h.jq(output, desc.Manifest, r, header)
 	if err != nil {
 		return fmt.Errorf("h.jq: %w", err)
-	}
-
-	if r.URL.Query().Get("render") == "x509" {
-		if bytes.Count(b, []byte("-----BEGIN CERTIFICATE-----")) > 1 {
-			header.JQ += " | while openssl x509 -text -noout 2>/dev/null; do :; done"
-		} else {
-			header.JQ += " | openssl x509 -text -noout"
-		}
-	} else if r.URL.Query().Get("render") == "history" {
-		header.JQ = strings.TrimSuffix(header.JQ, " | jq .")
-		header.JQ += ` | jq '.history[] | .v1Compatibility' -r | jq '.container_config.Cmd | join(" ")' -r | tac`
 	}
 
 	header.SizeLink = fmt.Sprintf("/sizes/%s?mt=%s&size=%d", ref.Context().Digest(desc.Digest.String()).String(), desc.MediaType, desc.Size)
@@ -770,7 +747,6 @@ func (h *handler) renderReferrers(w http.ResponseWriter, r *http.Request, src st
 	}
 
 	header := h.manifestHeader(ref.Digest(desc.Digest.String()), *desc)
-	header.JQ = fmt.Sprintf("curl -sL %s://%s/v2/%s/referrers/%s", ref.Scheme(), ref.RegistryStr(), ref.RepositoryStr(), ref.Identifier())
 	header.Referrers = false
 	header.Subject = ref.Identifier()
 
@@ -873,10 +849,8 @@ func (h *handler) renderBlobJSON(w http.ResponseWriter, r *http.Request, blobRef
 		Separator: "@",
 		Child:     ref.Identifier(),
 	}
-	header.JQ = crane("blob") + " " + ref.String()
 
 	if size > tooBig {
-		header.JQ += fmt.Sprintf(" | head -c %d", httpserve.TooBig)
 		if err := bodyTmpl.Execute(w, header); err != nil {
 			return fmt.Errorf("bodyTmpl: %w", err)
 		}
@@ -916,15 +890,6 @@ func (h *handler) renderBlobJSON(w http.ResponseWriter, r *http.Request, blobRef
 	b, err := h.jq(output, input, r, header)
 	if err != nil {
 		return fmt.Errorf("h.jq: %w", err)
-	}
-
-	if r.URL.Query().Get("render") == "history" {
-		header.JQ = strings.TrimSuffix(header.JQ, " | jq .")
-		header.JQ += " | jq '.history[] | .created_by' -r"
-	} else if r.URL.Query().Get("render") == "der" {
-		header.JQ += " | openssl x509 -inform der -text -noout"
-	} else if r.URL.Query().Get("render") == "xxd" {
-		header.JQ += " | xxd"
 	}
 
 	if err := bodyTmpl.Execute(w, header); err != nil {
@@ -1070,20 +1035,7 @@ func (h *handler) renderFile(w http.ResponseWriter, r *http.Request, ref name.Di
 			Separator: "@",
 			Child:     ref.Identifier(),
 		}
-		header.JQ = crane("blob") + " " + ref.String()
-		if kind == "zstd" {
-			header.JQ += " | zstd -d"
-		} else if kind == "gzip" {
-			header.JQ += " | gunzip"
-		}
-
-		if blob.size < 0 || blob.size > httpserve.TooBig {
-			header.JQ += fmt.Sprintf(" | head -c %d", httpserve.TooBig)
-		}
 		log.Printf("ctype=%q", ctype)
-		if !strings.HasPrefix(ctype, "text/") && !strings.Contains(ctype, "json") {
-			header.JQ += " | xxd"
-		}
 
 		return bodyTmpl.Execute(w, header)
 	})
@@ -1148,7 +1100,6 @@ func (h *handler) renderFS(w http.ResponseWriter, r *http.Request) error {
 			Separator: "@",
 			Child:     dig.Identifier(),
 		}
-		header.JQ = crane("blob") + " " + dig.String()
 		if err := bodyTmpl.Execute(w, header); err != nil {
 			return fmt.Errorf("bodyTmpl: %w", err)
 		}
@@ -1269,7 +1220,6 @@ func (h *handler) renderImage(w http.ResponseWriter, r *http.Request, ref name.D
 		Separator: "@",
 		Child:     ref.Identifier(),
 	}
-	header.JQ = "curl " + url
 
 	if err := bodyTmpl.Execute(w, header); err != nil {
 		return err
@@ -1518,7 +1468,6 @@ func (h *handler) renderIndex(w http.ResponseWriter, r *http.Request) error {
 func (h *handler) jq(output *jsonOutputter, b []byte, r *http.Request, header *HeaderData) ([]byte, error) {
 	jq, ok := r.URL.Query()["jq"]
 	if !ok {
-		header.JQ += " | jq ."
 		return b, nil
 	}
 
@@ -1526,8 +1475,6 @@ func (h *handler) jq(output *jsonOutputter, b []byte, r *http.Request, header *H
 		err error
 		exp string
 	)
-
-	exps := []string{header.JQ}
 
 	for _, j := range jq {
 		if debug {
@@ -1537,10 +1484,9 @@ func (h *handler) jq(output *jsonOutputter, b []byte, r *http.Request, header *H
 		if err != nil {
 			return nil, err
 		}
-		exps = append(exps, exp)
+		_ = exp // unused now
 	}
 
-	header.JQ = strings.Join(exps, " | ")
 	return b, nil
 }
 
@@ -1553,7 +1499,6 @@ func (h *handler) getTags(repo name.Repository) ([]string, bool) {
 
 func (h *handler) manifestHeader(ref name.Reference, desc v1.Descriptor) *HeaderData {
 	header := headerData(ref, desc)
-	header.JQ = crane("manifest") + " " + ref.String()
 	header.Referrers = true
 
 	identifiers := strings.TrimPrefix(ref.String(), ref.Context().String())
@@ -1724,29 +1669,6 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 		Separator: "@",
 		Child:     ref.Identifier(),
 	}
-	header.JQ = crane("blob") + " " + ref.String() + " | " + tarflags + " " + filelink
-
-	if r.URL.Query().Get("render") == "elf" {
-		header.JQ += " | objdump -x -"
-	} else {
-		if stat.Size() > httpserve.TooBig {
-			header.JQ += fmt.Sprintf(" | head -c %d", httpserve.TooBig)
-		}
-		if ctype == "application/octet-stream" || ctype == "elf" {
-			header.JQ += " | xxd"
-		}
-	}
-
-	if stat.IsDir() {
-		tarflags = "tar -tv "
-		if kind == "tar+gzip" {
-			tarflags = "tar -tvz "
-		} else if kind == "tar+zstd" {
-			tarflags = "tar --zstd -tv "
-		}
-
-		header.JQ = crane("blob") + " " + ref.String() + " | " + tarflags + " " + filelink
-	}
 	header.SizeLink = fmt.Sprintf("/size/%s?mt=%s&size=%d", ref.Context().Digest(hash.String()).String(), mediaType, int64(size))
 
 	if err := bodyTmpl.Execute(w, header); err != nil {
@@ -1830,9 +1752,6 @@ func renderDir(w http.ResponseWriter, fname string, prefix string, mediaType typ
 		Child:     ref.Identifier(),
 	}
 
-	// TODO: Make filename clickable to go up a directory.
-	header.JQ = crane("export") + " " + ref.String() + " | " + tarflags + " " + filename
-
 	header.SizeLink = fmt.Sprintf("/sizes/%s?mt=%s&size=%d", ref.Context().Digest(hash.String()).String(), mediaType, int64(size))
 
 	return bodyTmpl.Execute(w, header)
@@ -1876,16 +1795,6 @@ func renderDirSize(w http.ResponseWriter, r *http.Request, size int64, ref name.
 			tarflags += " | sort -n -r -k5"
 		} else {
 			tarflags += " | sort -n -r -k3"
-		}
-
-		if mediaType.IsImage() {
-			header.JQ = crane("export") + " " + ref.String() + " | " + tarflags
-		} else {
-			header.JQ = crane("blob") + " " + ref.String() + " | " + tarflags
-		}
-
-		if num > httpserve.TooBig {
-			header.JQ += fmt.Sprintf(" | head -c %d", httpserve.TooBig)
 		}
 
 		return bodyTmpl.Execute(w, header)
