@@ -301,7 +301,8 @@ Docker-Content-Digest: <a class="mt" href="/{{.Handler}}{{$.Repo}}@{{.Descriptor
 
 {{end}}
 </div>
-
+{{ if .JQ }}
+/* <h4><span style="padding:0;" class="noselect">$ </span>{{.JQ}}</h4> */
 {{ end }}
 `
 
