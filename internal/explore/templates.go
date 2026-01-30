@@ -110,13 +110,13 @@ Enter a <strong>public</strong> repository, e.g. <tt>"ubuntu"</tt>:
 
 </ul>
 </p>
-<h3>FAQ</h3>
 <h4>How does this work?</h4>
 <p>
-<p>Great question! See <a href="https://github.com/madler/zlib/blob/master/examples/zran.c">here</a>.</p>
-<p>Tl;dr, you can seek to an arbitrary position in a gzip stream if you know the 32KiB of uncompressed data that comes just before it, so by storing ~1% of the uncompressed layer size, I can jump ahead to predetermined locations and start reading from there rather than reading the entire layer.</p>
-<p>Thanks <a href="https://github.com/aidansteele">@aidansteele</a>!</p>
-<h4>Is this open source?</h4>
+<p>See <a href="https://github.com/madler/zlib/blob/master/examples/zran.c">here</a>.</p>
+<p>You can seek to an arbitrary position in a gzip stream
+<p> if you know the 32KiB of uncompressed data that comes just before it,
+<p> By storing ~1% of the uncompressed layer size, I can jump ahead to predetermined locations 
+<p> and start reading from there, rather than reading the entire layer.</p>
 <p><a href="https://hub.docker.com/">Docker Hub</a>.</p>
 </body>
 </html>
@@ -302,7 +302,7 @@ Docker-Content-Digest: <a class="mt" href="/{{.Handler}}{{$.Repo}}@{{.Descriptor
 {{end}}
 </div>
 {{ if .JQ }}
-<h4><span style="padding:0;" class="noselect">$ </span>{{.JQ}}</h4>
+/* <h4><span style="padding:0;" class="noselect">$ </span>{{.JQ}}</h4> */
 
 {{ end }}
 `
