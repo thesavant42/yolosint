@@ -689,7 +689,6 @@ func (h *handler) renderHistory(w http.ResponseWriter, r *http.Request, image st
 	header := HeaderData{
 		Repo:      ref.Context().String(),
 		Reference: ref.String(),
-		JQ:        `curl -H "$(crane auth token -H ` + ref.Context().String() + `)" ` + u.String(),
 	}
 
 	if err := headerTmpl.Execute(w, TitleData{image}); err != nil {
@@ -1625,21 +1624,12 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 		}
 	}
 
-	tarflags := "tar -Ox "
-	if kind == "tar+gzip" {
-		tarflags = "tar -Oxz "
-	} else if kind == "tar+zstd" {
-		tarflags = "tar --zstd -Ox "
-	}
-
 	hash, err := v1.NewHash(ref.Identifier())
 	if err != nil {
 		return err
 	}
 
-	filelink := filename
-
-	// Compute links for JQ
+	// Compute links for parent directory
 	fprefix := ""
 	if strings.HasPrefix(filename, "./") {
 		fprefix = "./"
@@ -1731,8 +1721,6 @@ func renderDir(w http.ResponseWriter, fname string, prefix string, mediaType typ
 	} else {
 		logs.Debug.Printf("sys: %T", sys)
 	}
-
-	tarflags := "tar -tv "
 
 	hash, err := v1.NewHash(ref.Identifier())
 	if err != nil {
