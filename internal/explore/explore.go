@@ -1629,25 +1629,6 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 		return err
 	}
 
-	// Compute links for parent directory
-	fprefix := ""
-	if strings.HasPrefix(filename, "./") {
-		fprefix = "./"
-	}
-	filename = strings.TrimSuffix(filename, "/")
-	dir := path.Dir(filename)
-	if dir != "." {
-		base := path.Base(filename)
-		sep := strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(filename, fprefix), dir), base)
-
-		href := path.Join(prefix, dir)
-		htext := fprefix + dir + sep
-
-		logs.Debug.Printf("dir=%q, sep=%q, base=%q, href=%q, htext=%q", dir, sep, base, href, htext)
-		dirlink := fmt.Sprintf(`<a class="mt" href="/%s">%s</a>`, href, htext)
-		filelink = dirlink + base
-	}
-
 	desc := v1.Descriptor{
 		Size:      size,
 		Digest:    hash,
