@@ -39,7 +39,7 @@ const (
 <html>
 <body>
 <head>
-<title>Registry Explorer</title>
+<title></title>
 <link rel="icon" href="/favicon.svg">
 <style>
 .mt:hover {
@@ -79,13 +79,7 @@ body {
 
 </style>
 </head>
-<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link">Registry Explorer</span></a></h1>
-<p>
-This beautiful tool allows you to <em>explore</em> the contents of a registry interactively.
-</p>
-<p>
-You can even drill down into layers to explore an image's filesystem.
-</p>
+<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link"></span></a></h1>
 <p>
 Enter a <strong>public</strong> image, e.g. <tt>"ubuntu:latest"</tt>:
 </p>
@@ -119,26 +113,11 @@ Enter a <strong>public</strong> repository, e.g. <tt>"ubuntu"</tt>:
 <h3>FAQ</h3>
 <h4>How does this work?</h4>
 <p>
-This service lives on <a href="https://cloud.run">Cloud Run</a> and uses <a href="https://github.com/google/go-containerregistry">google/go-containerregistry</a> for registry interactions.
-</p>
-<h4>Isn't this expensive to run?</h4>
-<p>Not really! Ingress is cheap, Cloud Run is cheap, and GCS is cheap.</p>
-<p>To avoid paying for egress, I limit the amount of data that I'll serve directly and instead give you a command you can run on your own machine.</p>
-<p>The most expensive part of this is actually the domain name.</p>
-<h4>Isn't this expensive for the registry?</h4>
-<p>Not really! The first time a layer is accessed, I download and index it. Browsing the filesystem just uses that index, and opening a file uses Range requests to load small chunks of the layer as needed.</p>
-<p>Since I only have to download the whole layer once, this actually reduces traffic to the registry in a lot of cases, e.g. if you share a link with someone rather than having them pull the whole image on their machine.</p>
-<p>In fact, Docker has graciously sponsored this service by providing me an account with unlimited public Docker Hub access. Thanks, Docker!</p>
-<h4>That can't be true, gzip doesn't support random access!</h4>
-<p>
-That's not a question.
-</p>
-<h4>Okay then, how does random access work if the layers are gzipped tarballs?</h4>
 <p>Great question! See <a href="https://github.com/madler/zlib/blob/master/examples/zran.c">here</a>.</p>
 <p>Tl;dr, you can seek to an arbitrary position in a gzip stream if you know the 32KiB of uncompressed data that comes just before it, so by storing ~1% of the uncompressed layer size, I can jump ahead to predetermined locations and start reading from there rather than reading the entire layer.</p>
 <p>Thanks <a href="https://github.com/aidansteele">@aidansteele</a>!</p>
 <h4>Is this open source?</h4>
-<p>Yes! See <a href="https://github.com/jonjohnsonjr/dagdotdev">here</a>.</p>
+<p><a href="https://hub.docker.com/">Docker Hub</a>.</p>
 </body>
 </html>
 `
@@ -147,7 +126,7 @@ That's not a question.
 <html>
 <body>
 <head>
-<title>Registry Explorer</title>
+<title></title>
 <link rel="icon" href="/favicon.svg">
 <style>
 .mt:hover {
@@ -186,7 +165,7 @@ body {
 }
 </style>
 </head>
-<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link">Registry Explorer</span></a></h1>
+<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link"></span></a></h1>
 <p>
 It looks like we encountered an auth error:
 </p>
@@ -295,7 +274,7 @@ input ~ .tab {          /* grey line between tab and contents */
 	bodyTemplate = `
 <body>
 <div>
-<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link">Registry Explorer</span></a></h1>
+<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link"></span></a></h1>
 {{ if .Up }}
 <h2>{{ if and (ne .Up.Parent "docker.io") (ne .Up.Parent "index.docker.io") }}<a class="mt" href="/?repo={{.Up.Parent}}">{{.Up.Parent}}</a>{{else}}{{.Up.Parent}}{{end}}{{.Up.Separator}}{{if .RefHandler }}<a class="mt" href="/{{.RefHandler}}{{.Reference}}{{if .EscapedMediaType}}{{.QuerySep}}mt={{.EscapedMediaType}}{{end}}">{{.Up.Child}}</a>{{else}}{{.Up.Child}}{{end}}{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}</h2>
 {{ else }}
