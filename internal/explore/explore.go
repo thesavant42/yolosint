@@ -1646,6 +1646,12 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 		return err
 	}
 
+	// Add save link for files (not directories)
+	if !stat.IsDir() {
+		saveURL := r.URL.Path + "?dl=1"
+		fmt.Fprintf(w, `<p><a href="%s">save</a></p>`, saveURL)
+	}
+
 	if _, ok := f.(httpserve.Files); ok {
 		fmt.Fprintf(w, `<div><template shadowrootmode="open"><style>
 @keyframes spin {
