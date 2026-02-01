@@ -1063,7 +1063,7 @@ func serveContent(w http.ResponseWriter, r *http.Request, name string, modtime t
 				rw := w
 				var w io.Writer
 
-				if strings.HasPrefix(ctype, "text/") || strings.Contains(ctype, "json") || strings.Contains(ctype, "yaml") || ctype == "application/x-sh" {
+				if strings.HasPrefix(ctype, "text/") || strings.Contains(ctype, "json") || strings.Contains(ctype, "yaml") || strings.Contains(ctype, "xml") || ctype == "application/x-sh" {
 					w = &dumbEscaper{buf: bufio.NewWriter(rw)}
 				} else {
 					w = xxd.NewWriter(rw, sendSize)
