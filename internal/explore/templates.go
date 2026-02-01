@@ -3,7 +3,7 @@ package explore
 import (
 	"text/template"
 
-	v1 "github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
 )
 
 var (
@@ -99,7 +99,7 @@ Enter a <strong>public</strong> repository, e.g. <tt>"ubuntu"</tt>:
 <p>See <a href="https://github.com/madler/zlib/blob/master/examples/zran.c">here</a>.</p>
 <p>You can seek to an arbitrary position in a gzip stream
 <p> if you know the 32KiB of uncompressed data that comes just before it,
-<p> By storing ~1% of the uncompressed layer size, I can jump ahead to predetermined locations 
+<p> By storing ~1% of the uncompressed layer size, I can jump ahead to predetermined locations
 <p> and start reading from there, rather than reading the entire layer.</p>
 <p><a href="https://hub.docker.com/">Docker Hub</a>.</p>
 </body>

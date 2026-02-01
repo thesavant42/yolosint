@@ -25,20 +25,20 @@ import (
 	"github.com/digitorus/timestamp"
 	"github.com/dustin/go-humanize"
 	"github.com/fxamacker/cbor/v2"
-	"github.com/google/go-containerregistry/pkg/authn"
-	"github.com/google/go-containerregistry/pkg/logs"
-	"github.com/google/go-containerregistry/pkg/name"
-	v1 "github.com/google/go-containerregistry/pkg/v1"
-	"github.com/google/go-containerregistry/pkg/v1/google"
-	"github.com/google/go-containerregistry/pkg/v1/partial"
-	"github.com/google/go-containerregistry/pkg/v1/remote"
-	"github.com/google/go-containerregistry/pkg/v1/remote/transport"
-	"github.com/google/go-containerregistry/pkg/v1/types"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/name"
+	v1 "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/google"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/partial"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote/transport"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
 	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
 	"github.com/jonjohnsonjr/dagdotdev/internal/gguf"
 	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
 	"github.com/jonjohnsonjr/dagdotdev/internal/xxd"
-	"github.com/klauspost/compress/gzhttp"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/gzhttp"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 )
@@ -1365,7 +1365,7 @@ func (h *handler) multiFS(w http.ResponseWriter, r *http.Request, dig name.Diges
 				return fmt.Errorf("indexCache.Index(%q) = %w", dig.Identifier(), err)
 			}
 			if index == nil {
-				l, err := remote.Layer(layerRef)
+				l, err := remote.Layer(layerRef, opts...)
 				if err != nil {
 					return err
 				}
@@ -1808,7 +1808,7 @@ func (h *handler) renderZurl(w http.ResponseWriter, r *http.Request) error {
 		}
 		if index == nil {
 			layerRef := dig.Context().Digest(layer.Digest.String())
-			l, err := remote.Layer(layerRef)
+			l, err := remote.Layer(layerRef, opts...)
 			if err != nil {
 				return err
 			}
