@@ -344,12 +344,68 @@ func renderJSON(w *jsonOutputter, b []byte) error {
 	}
 	if m, ok := v.(map[string]interface{}); ok {
 		w.root = m
+		// Check if this is a manifest with config and layers
+		if _, hasConfig := m["config"]; hasConfig {
+			if _, hasLayers := m["layers"]; hasLayers {
+				return renderManifestTables(w, m)
+			}
+		}
 	}
 
 	if err := renderRaw(w, &raw); err != nil {
 		return fmt.Errorf("renderRaw: %w", err)
 	}
 	w.undiv()
+	return nil
+}
+
+func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
+	image := w.u.Query().Get("image")
+
+	// Config table
+	w.Print(`<h3>config</h3><table>`)
+	if cfg, ok := m["config"].(map[string]interface{}); ok {
+		digest := ""
+		size := int64(0)
+		mt := ""
+		if d, ok := cfg["digest"].(string); ok {
+			digest = d
+		}
+		if s, ok := cfg["size"].(float64); ok {
+			size = int64(s)
+		}
+		if t, ok := cfg["mediaType"].(string); ok {
+			mt = t
+		}
+		w.Printf(`<tr><td>%s</td><td><a href="/%s%s@%s?mt=%s&size=%d">%s</a></td></tr>`,
+			humanize.IBytes(uint64(size)), handlerForMT(mt), w.repo, digest, url.QueryEscape(mt), size, html.EscapeString(digest))
+	}
+	w.Print(`</table>`)
+
+	// Layers table
+	w.Print(`<h3><a href="/layers/` + image + `/">layers</a></h3><table>`)
+	if layers, ok := m["layers"].([]interface{}); ok {
+		for _, l := range layers {
+			if layer, ok := l.(map[string]interface{}); ok {
+				digest := ""
+				size := int64(0)
+				mt := ""
+				if d, ok := layer["digest"].(string); ok {
+					digest = d
+				}
+				if s, ok := layer["size"].(float64); ok {
+					size = int64(s)
+				}
+				if t, ok := layer["mediaType"].(string); ok {
+					mt = t
+				}
+				w.Printf(`<tr><td>%s</td><td><a href="/%s%s@%s?mt=%s&size=%d">%s</a></td></tr>`,
+					humanize.IBytes(uint64(size)), handlerForMT(mt), w.repo, digest, url.QueryEscape(mt), size, html.EscapeString(digest))
+			}
+		}
+	}
+	w.Print(`</table>`)
+
 	return nil
 }
 
@@ -647,7 +703,7 @@ func renderMap(w *jsonOutputter, o map[string]interface{}, raw *json.RawMessage)
 			}
 		case "mediaType":
 			// Skip mediaType in layers array - it's always the same
-			if strings.HasPrefix(w.jth(-1), ".layers") {
+			if strings.Contains(strings.Join(w.jq, ""), ".layers[") {
 				continue
 			}
 			mt := ""
