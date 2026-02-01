@@ -646,6 +646,10 @@ func renderMap(w *jsonOutputter, o map[string]interface{}, raw *json.RawMessage)
 				}
 			}
 		case "mediaType":
+			// Skip mediaType in layers array - it's always the same
+			if strings.HasPrefix(w.jth(-1), ".layers") {
+				continue
+			}
 			mt := ""
 			if err := json.Unmarshal(v, &mt); err != nil {
 				log.Printf("Unmarshal mediaType %q: %v", string(v), err)
