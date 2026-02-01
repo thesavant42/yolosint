@@ -377,8 +377,13 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 		if t, ok := cfg["mediaType"].(string); ok {
 			mt = t
 		}
-		w.Printf(`<tr><td>%s</td><td><a href="/%s%s@%s?mt=%s&size=%d">%s</a></td></tr>`,
-			humanize.IBytes(uint64(size)), handlerForMT(mt), w.repo, digest, url.QueryEscape(mt), size, html.EscapeString(digest))
+		handler := handlerForMT(mt)
+		qs := "?"
+		if strings.Contains(handler, "?") {
+			qs = "&"
+		}
+		w.Printf(`<tr><td>%s</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td></tr>`,
+			humanize.IBytes(uint64(size)), handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 	}
 	w.Print(`</table>`)
 
@@ -399,10 +404,15 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				if t, ok := layer["mediaType"].(string); ok {
 					mt = t
 				}
+				handler := handlerForMT(mt)
+				qs := "?"
+				if strings.Contains(handler, "?") {
+					qs = "&"
+				}
 				// Size links to /size/ view, digest links to /fs/ view
-				w.Printf(`<tr><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="/%s%s@%s?mt=%s&size=%d">%s</a></td></tr>`,
+				w.Printf(`<tr><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td></tr>`,
 					w.repo, digest, url.QueryEscape(mt), size, humanize.IBytes(uint64(size)),
-					handlerForMT(mt), w.repo, digest, url.QueryEscape(mt), size, html.EscapeString(digest))
+					handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 			}
 		}
 	}
