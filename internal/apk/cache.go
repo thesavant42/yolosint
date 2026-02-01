@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 )
 
 type Cache interface {
@@ -200,6 +200,9 @@ func (d *dirCache) Reader(ctx context.Context, key string) (io.ReadCloser, error
 }
 
 func (d *dirCache) RangeReader(ctx context.Context, key string, offset, length int64) (io.ReadCloser, error) {
+	if offset == 0 && length == -1 {
+		return d.Reader(ctx, key)
+	}
 	f, err := os.Open(d.file(key) + ".tar.gz")
 	if err != nil {
 		return nil, err
