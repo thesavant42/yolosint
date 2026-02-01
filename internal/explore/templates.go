@@ -230,11 +230,12 @@ td {
 	<h2>{{.Reference}}{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}</h2>
 {{ end }}
 {{ if .Descriptor }}
-{<br>
-&nbsp;&nbsp;"mediaType": "{{.Descriptor.MediaType}}",<br>
-&nbsp;&nbsp;"digest": "<a class="mt" href="/{{.Handler}}{{$.Repo}}@{{.Descriptor.Digest}}{{if .EscapedMediaType}}{{.QuerySep}}mt={{.EscapedMediaType}}{{end}}&size={{.Descriptor.Size}}">{{.Descriptor.Digest}}</a>",<br>
-&nbsp;&nbsp;"size": {{if .SizeLink}}<a class="mt" href="{{.SizeLink}}">{{.Descriptor.Size}}</a>{{else}}{{.Descriptor.Size}}{{end}}<br>
-}{{if $.Subject}}<br>OCI-Subject: <a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a>{{end}}
+<table>
+<tr><td>mediaType</td><td>{{.Descriptor.MediaType}}</td></tr>
+<tr><td>digest</td><td><a class="mt" href="/{{.Handler}}{{$.Repo}}@{{.Descriptor.Digest}}{{if .EscapedMediaType}}{{.QuerySep}}mt={{.EscapedMediaType}}{{end}}&size={{.Descriptor.Size}}">{{.Descriptor.Digest}}</a></td></tr>
+<tr><td>size</td><td>{{if .SizeLink}}<a class="mt" href="{{.SizeLink}}">{{.Descriptor.Size}}</a>{{else}}{{.Descriptor.Size}}{{end}}</td></tr>
+{{if $.Subject}}<tr><td>OCI-Subject</td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr>{{end}}
+</table>
 {{end}}
 </div>
 `

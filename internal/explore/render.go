@@ -143,7 +143,7 @@ func (w *jsonOutputter) LinkRepo(ref, text string) {
 
 func (w *jsonOutputter) Key(k string) {
 	w.tabf()
-	w.Printf(`"%s":`, k)
+	w.Printf(`<tr><td>%s</td><td>`, k)
 	w.key = true
 }
 
@@ -156,7 +156,7 @@ func (w *jsonOutputter) Value(b []byte) {
 
 func (w *jsonOutputter) StartMap() {
 	w.tabf()
-	w.Print("{")
+	w.Print("<table>")
 	w.newline()
 	w.push()
 	w.key = false
@@ -164,11 +164,11 @@ func (w *jsonOutputter) StartMap() {
 
 func (w *jsonOutputter) EndMap() {
 	if !w.Fresh() {
-		w.undiv()
+		w.Print("</td></tr>")
 	}
 	w.pop()
 	w.newline()
-	w.Print(w.tabs() + "}")
+	w.Print(w.tabs() + "</table>")
 	w.key = false
 	w.name = ""
 	w.unfresh()
@@ -176,7 +176,7 @@ func (w *jsonOutputter) EndMap() {
 
 func (w *jsonOutputter) StartArray() {
 	w.tabf()
-	w.Print("[")
+	w.Print("<table>")
 	w.newline()
 	w.push()
 	w.key = false
@@ -184,11 +184,11 @@ func (w *jsonOutputter) StartArray() {
 
 func (w *jsonOutputter) EndArray() {
 	if !w.Fresh() {
-		w.undiv()
+		w.Print("</td></tr>")
 	}
 	w.pop()
 	w.newline()
-	w.Print(w.tabs() + "]")
+	w.Print(w.tabs() + "</table>")
 	w.key = false
 	w.unfresh()
 }
@@ -204,14 +204,9 @@ func (w *jsonOutputter) Print(s string) {
 func (w *jsonOutputter) tabf() {
 	if !w.key {
 		if !w.Fresh() {
-			w.Print(",")
-			w.undiv()
+			w.Print("</td></tr>")
 			w.newline()
 		}
-		w.div()
-		//w.Printf(w.tabs())
-	} else {
-		w.Print(" ")
 	}
 }
 
@@ -223,15 +218,11 @@ func (w *jsonOutputter) Fresh() bool {
 }
 
 func (w *jsonOutputter) push() {
-	w.Print(w.tabs() + `<div class="indent">` + "\n")
 	w.fresh = append(w.fresh, true)
 }
 
 func (w *jsonOutputter) pop() {
 	w.fresh = w.fresh[:len(w.fresh)-1]
-	w.newline()
-	w.Print(w.tabs())
-	w.undiv()
 }
 
 func (w *jsonOutputter) jpush(j string) {
