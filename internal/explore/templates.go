@@ -80,6 +80,14 @@ Enter a <strong>public</strong> repository, e.g. <tt>"ubuntu"</tt>:
 <input type="submit" />
 </form>
 <p>
+<p>
+Search <a href="https://hub.docker.com/">Docker Hub</a>:
+</p>
+<form action="https://hub.docker.com/search" method="GET" autocomplete="off" spellcheck="false">
+<input size="100" type="text" name="q" placeholder="Search Docker Hub..."/>
+<input type="submit" value="Search"/>
+</form>
+<p>
 <h4>Interesting examples</h4>
 <ul>
   <li><a href="/?image=cgr.dev/chainguard/static:latest-glibc">cgr.dev/chainguard/static:latest-glibc</a></li>
