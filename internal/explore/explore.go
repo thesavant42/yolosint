@@ -1057,7 +1057,7 @@ func (h *handler) renderFS(w http.ResponseWriter, r *http.Request) error {
 
 	index, err := h.getIndex(r.Context(), dig.Identifier())
 	if err != nil {
-		return fmt.Errorf("indexCache.Index(%q) = %w", dig.Identifier(), err)
+		return fmt.Errorf("indexCache.Index(%s) = %w", dig.Identifier(), err)
 	}
 	if index != nil {
 		fs, err := h.indexedFS(w, r, dig, ref, index)
@@ -1136,7 +1136,7 @@ func (h *handler) renderFat(w http.ResponseWriter, r *http.Request) error {
 
 	index, err := h.getIndex(r.Context(), dig.Identifier())
 	if err != nil {
-		return fmt.Errorf("indexCache.Index(%q) = %w", dig.Identifier(), err)
+		return fmt.Errorf("indexCache.Index(%s) = %w", dig.Identifier(), err)
 	}
 
 	if index == nil {
@@ -1362,7 +1362,7 @@ func (h *handler) multiFS(w http.ResponseWriter, r *http.Request, dig name.Diges
 		g.Go(func() error {
 			index, err := h.getIndex(r.Context(), digest.String())
 			if err != nil {
-				return fmt.Errorf("indexCache.Index(%q) = %w", dig.Identifier(), err)
+				return fmt.Errorf("indexCache.Index(%s) = %w", dig.Identifier(), err)
 			}
 			if index == nil {
 				l, err := remote.Layer(layerRef, opts...)
@@ -1804,7 +1804,7 @@ func (h *handler) renderZurl(w http.ResponseWriter, r *http.Request) error {
 		digest := layer.Digest
 		index, err := h.getIndex(r.Context(), digest.String())
 		if err != nil {
-			return fmt.Errorf("indexCache.Index(%q) = %w", dig.Identifier(), err)
+			return fmt.Errorf("indexCache.Index(%s) = %w", dig.Identifier(), err)
 		}
 		if index == nil {
 			layerRef := dig.Context().Digest(layer.Digest.String())

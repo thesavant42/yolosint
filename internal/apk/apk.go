@@ -464,7 +464,7 @@ func (h *handler) renderFS(w http.ResponseWriter, r *http.Request) error {
 
 	index, err := h.getIndex(r.Context(), ref)
 	if err != nil {
-		return fmt.Errorf("indexCache.Index(%q) = %w", ref, err)
+		return fmt.Errorf("indexCache.Index(%s) = %w", ref, err)
 	}
 	if index != nil {
 		fs, err := h.indexedFS(r, ref, index)
@@ -628,7 +628,7 @@ func (h *handler) renderLocalFS(w http.ResponseWriter, r *http.Request) error {
 
 	index, err := h.getIndex(r.Context(), ref)
 	if err != nil {
-		return fmt.Errorf("indexCache.Index(%q) = %w", ref, err)
+		return fmt.Errorf("indexCache.Index(%s) = %w", ref, err)
 	}
 	if index != nil {
 		fs, err := h.indexedFS(r, ref, index)
@@ -1205,7 +1205,7 @@ func (h *handler) renderFat(w http.ResponseWriter, r *http.Request) error {
 
 	index, err := h.getIndex(r.Context(), ref)
 	if err != nil {
-		return fmt.Errorf("indexCache.Index(%q) = %w", ref, err)
+		return fmt.Errorf("indexCache.Index(%s) = %w", ref, err)
 	}
 
 	if index == nil {
