@@ -146,6 +146,10 @@ func (h *handler) getIndex(ctx context.Context, prefix string) (soci.Index, erro
 		return nil, nil
 	}
 	if err != nil {
+		// Delete corrupted cache entry so it gets re-indexed next time
+		key := indexKey(prefix, 0)
+		logs.Debug.Printf("getIndex: deleting corrupted cache entry %q due to error: %v", key, err)
+		_ = h.indexCache.Delete(ctx, key)
 		return nil, err
 	}
 

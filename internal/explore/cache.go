@@ -32,6 +32,7 @@ type cache interface {
 	Writer(context.Context, string) (io.WriteCloser, error)
 	Reader(context.Context, string) (io.ReadCloser, error)
 	RangeReader(ctx context.Context, key string, offset, length int64) (io.ReadCloser, error)
+	Delete(ctx context.Context, key string) error
 }
 
 type cacheSeeker struct {
@@ -142,6 +143,10 @@ func (g *gcsCache) Size(ctx context.Context, key string) (int64, error) {
 	return attrs.Size, nil
 }
 
+func (g *gcsCache) Delete(ctx context.Context, key string) error {
+	return g.bucket.Object(g.treePath(key)).Delete(ctx)
+}
+
 type dirCache struct {
 	dir string
 }
@@ -216,6 +221,12 @@ func (d *dirCache) Size(ctx context.Context, key string) (int64, error) {
 		return -1, err
 	}
 	return stat.Size(), nil
+}
+
+func (d *dirCache) Delete(ctx context.Context, key string) error {
+	logs.Debug.Printf("dirCache.Delete(%q)", key)
+	_ = os.Remove(d.file(key) + ".toc.json.gz")
+	return os.Remove(d.file(key) + ".tar.gz")
 }
 
 type dirWriter struct {
@@ -388,6 +399,18 @@ func (m *memCache) Size(ctx context.Context, key string) (int64, error) {
 	return int64(len(e.buffer)), nil
 }
 
+func (m *memCache) Delete(ctx context.Context, key string) error {
+	m.Lock()
+	defer m.Unlock()
+	for i, e := range m.entries {
+		if e.key == key {
+			m.entries = append(m.entries[:i], m.entries[i+1:]...)
+			return nil
+		}
+	}
+	return nil
+}
+
 type multiCache struct {
 	caches []cache
 }
@@ -487,6 +510,16 @@ func (m *multiCache) Size(ctx context.Context, key string) (int64, error) {
 	}
 
 	return -1, io.EOF
+}
+
+func (m *multiCache) Delete(ctx context.Context, key string) error {
+	errs := []error{}
+	for _, c := range m.caches {
+		if err := c.Delete(ctx, key); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return Join(errs...)
 }
 
 type multiWriter struct {
