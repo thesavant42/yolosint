@@ -11,10 +11,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
 	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
 	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
 )
 
 // 5 MB.
@@ -265,6 +265,9 @@ func (h *handler) createIndex(ctx context.Context, rc io.ReadCloser, size int64,
 	toc, err := indexer.TOC()
 	if err != nil {
 		return nil, fmt.Errorf("TOC: %w", err)
+	}
+	if cw, ok := cw.(interface{ Complete() }); ok {
+		cw.Complete()
 	}
 	if h.tocCache != nil {
 		if err := h.tocCache.Put(ctx, key, toc); err != nil {

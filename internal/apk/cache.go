@@ -219,19 +219,30 @@ func (d *dirCache) Size(ctx context.Context, key string) (int64, error) {
 }
 
 type dirWriter struct {
-	dst string
-	f   *os.File
+	dst      string
+	f        *os.File
+	complete bool
 }
 
 func (d *dirWriter) Write(p []byte) (n int, err error) {
 	return d.f.Write(p)
 }
 
+func (d *dirWriter) Complete() {
+	d.complete = true
+}
+
 func (d *dirWriter) Close() error {
+	name := d.f.Name()
 	if err := d.f.Close(); err != nil {
 		return fmt.Errorf("closing: %w", err)
 	}
-	if err := os.Rename(d.f.Name(), d.dst); err != nil {
+	if !d.complete {
+		// Clean up incomplete index file
+		os.Remove(name)
+		return nil
+	}
+	if err := os.Rename(name, d.dst); err != nil {
 		return fmt.Errorf("renaming: %w", err)
 	}
 	return nil
@@ -494,6 +505,14 @@ func (t *multiWriter) Write(p []byte) (n int, err error) {
 		}
 	}
 	return len(p), nil
+}
+
+func (t *multiWriter) Complete() {
+	for _, w := range t.writers {
+		if cw, ok := w.(interface{ Complete() }); ok {
+			cw.Complete()
+		}
+	}
 }
 
 func (t *multiWriter) Close() error {

@@ -10,12 +10,12 @@ import (
 	"net/http"
 	"strings"
 
+	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
+	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/name"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
-	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
-	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/zstd"
 )
 
@@ -120,6 +120,9 @@ func (h *handler) tryNewIndex(w http.ResponseWriter, r *http.Request, dig name.D
 		toc, err := indexer.TOC()
 		if err != nil {
 			return kind, nil, nil, fmt.Errorf("TOC(): %w", err)
+		}
+		if cw, ok := cw.(interface{ Complete() }); ok {
+			cw.Complete()
 		}
 		if h.tocCache != nil {
 			if err := h.tocCache.Put(r.Context(), key, toc); err != nil {
@@ -240,6 +243,9 @@ func (h *handler) createIndex(ctx context.Context, rc io.ReadCloser, size int64,
 	toc, err := indexer.TOC()
 	if err != nil {
 		return nil, fmt.Errorf("TOC: %w", err)
+	}
+	if cw, ok := cw.(interface{ Complete() }); ok {
+		cw.Complete()
 	}
 	if h.tocCache != nil {
 		if err := h.tocCache.Put(ctx, key, toc); err != nil {
