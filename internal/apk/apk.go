@@ -28,15 +28,15 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/digitorus/timestamp"
+	"github.com/jonjohnsonjr/dagdotdev/internal/forks/elf"
+	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
+	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
+	"github.com/jonjohnsonjr/dagdotdev/internal/xxd"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/elf"
-	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
-	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
-	"github.com/jonjohnsonjr/dagdotdev/internal/xxd"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/gzhttp"
 )
 
@@ -970,7 +970,7 @@ func (h *handler) renderHeader(w http.ResponseWriter, r *http.Request, fname str
   to {
     transform: rotateX(360deg);
   }
-}</style><p><slot name="message"><span style="line-height: .707em; width: .707em; display: inline-block; animation: spin 1.0s infinite linear;">🤐</span> Loading<span><slot name="progress"></slot></span></slot></p><pre><slot name="file"></slot></pre></template>`)
+}</style><p><slot name="message"><span style="line-height: .707em; width: .707em; display: inline-block; animation: spin 1.0s infinite linear;">🚯</span> Loading<span><slot name="progress"></slot></span></slot></p><pre><slot name="file"></slot></pre></template>`)
 	}
 
 	return nil

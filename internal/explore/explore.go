@@ -25,6 +25,10 @@ import (
 	"github.com/digitorus/timestamp"
 	"github.com/dustin/go-humanize"
 	"github.com/fxamacker/cbor/v2"
+	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
+	"github.com/jonjohnsonjr/dagdotdev/internal/gguf"
+	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
+	"github.com/jonjohnsonjr/dagdotdev/internal/xxd"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/name"
@@ -34,10 +38,6 @@ import (
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote/transport"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
-	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
-	"github.com/jonjohnsonjr/dagdotdev/internal/gguf"
-	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
-	"github.com/jonjohnsonjr/dagdotdev/internal/xxd"
 	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/gzhttp"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
@@ -1664,7 +1664,7 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
   to {
     transform: rotateX(360deg);
   }
-}</style><p><slot name="message"><span style="line-height: .707em; width: .707em; display: inline-block; animation: spin 1.0s infinite linear;">🤐</span> Loading<span><slot name="progress"></slot></span></slot></p><pre><slot name="file"></slot></pre></template>`)
+}</style><p><slot name="message"><span style="line-height: .707em; width: .707em; display: inline-block; animation: spin 1.0s infinite linear;">🚯</span> Loading<span><slot name="progress"></slot></span></slot></p><pre><slot name="file"></slot></pre></template>`)
 	}
 
 	return nil
