@@ -38,6 +38,7 @@ func (h *handler) tryNewIndex(w http.ResponseWriter, r *http.Request, dig name.D
 		tr      tarReader
 		indexer *soci.Indexer
 		kind    string
+		cw      io.WriteCloser
 	)
 
 	h.Lock()
@@ -65,7 +66,8 @@ func (h *handler) tryNewIndex(w http.ResponseWriter, r *http.Request, dig name.D
 		}
 	} else {
 		// TODO: Plumb this down into NewIndexer so we don't create it until we need to.
-		cw, err := h.indexCache.Writer(r.Context(), key)
+		var err error
+		cw, err = h.indexCache.Writer(r.Context(), key)
 		if err != nil {
 			return "", nil, nil, fmt.Errorf("indexCache.Writer: %w", err)
 		}
