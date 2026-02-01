@@ -418,6 +418,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	}
 	w.Print(`</table>`)
 
+	w.undiv()
 	return nil
 }
 

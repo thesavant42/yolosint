@@ -1,21 +1,11 @@
-# Forked from and Inspired by `oci.dag.dev`
+# Docker Dorker - OCI ICU 
 
-This is a web server for exploring the contents of an OCI registry.
+Forked from and Inspired by `oci.dag.dev`
+
+## Docker Dorker
+This is a web server for exploring the contents of an OCI registry, FS style output.
 
 ## Running it
+`rm ./oci; git pull; go build /cmd/oci ; ./oci -v;`
 
-Some things will probably break if the environment is different.
-
-For local testing, I usually:
-
-```
-CACHE_DIR=/tmp/oci go run ./cmd/oci -v
-```
-
-On Cloud Run, I set `CACHE_BUCKET` to a GCS bucket in the same region as the service.
-
-If you want private GCP images to work via oauth, you need to set `CLIENT_ID`, `CLIENT_SECRET`, and `REDIRECT_URL` to the correct values.
-
-If you want to use ambient creds, set `AUTH=keychain`.
-
-See also [`apk.dag.dev`](./cmd/apk/README.md);
+Opens a listener on port localhost:8080 but I forward this sto port 8042 in Docker. That aligns with the url on line 16 of [DockerHubOCI Explorer-1.1.user.js](/DockerHubOCI Explorer-1.1.user.js)
