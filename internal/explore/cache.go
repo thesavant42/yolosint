@@ -152,7 +152,9 @@ type dirCache struct {
 }
 
 func (d *dirCache) file(key string) string {
-	return filepath.Join(d.dir, strings.Replace(key, ":", "-", 1))
+	sanitized := strings.Replace(key, ":", "-", 1)
+	sanitized = strings.ReplaceAll(sanitized, "/", "-")
+	return filepath.Join(d.dir, sanitized)
 }
 
 func (d *dirCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
@@ -188,7 +190,9 @@ func (d *dirCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 }
 
 func (d *dirCache) Writer(ctx context.Context, key string) (io.WriteCloser, error) {
-	tmp, err := os.CreateTemp(d.dir, key)
+	pattern := strings.Replace(key, ":", "-", 1)
+	pattern = strings.ReplaceAll(pattern, "/", "-")
+	tmp, err := os.CreateTemp(d.dir, pattern)
 	if err != nil {
 		return nil, err
 	}
