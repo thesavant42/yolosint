@@ -232,7 +232,7 @@ td {
 {{ if .Descriptor }}
 <table>
 <tr><td>mediaType</td><td>{{.Descriptor.MediaType}}</td></tr>
-<tr><td>digest</td><td><a class="mt" href="/{{.Handler}}{{$.Repo}}@{{.Descriptor.Digest}}{{if .EscapedMediaType}}{{.QuerySep}}mt={{.EscapedMediaType}}{{end}}&size={{.Descriptor.Size}}">{{.Descriptor.Digest}}</a></td></tr>
+<tr><td>digest</td><td><a class="mt" href="/{{.Handler}}{{$.Repo}}@{{.Descriptor.Digest}}{{.QuerySep}}{{if .EscapedMediaType}}mt={{.EscapedMediaType}}&{{end}}size={{.Descriptor.Size}}">{{.Descriptor.Digest}}</a></td></tr>
 <tr><td>size</td><td>{{if .SizeLink}}<a class="mt" href="{{.SizeLink}}">{{.Descriptor.Size}}</a>{{else}}{{.Descriptor.Size}}{{end}}</td></tr>
 {{if $.Subject}}<tr><td>OCI-Subject</td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr>{{end}}
 </table>
