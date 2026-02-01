@@ -1664,7 +1664,7 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
   to {
     transform: rotateX(360deg);
   }
-}</style><p><slot name="message"><span style="line-height: .707em; width: .707em; display: inline-block; animation: spin 1.0s infinite linear;">🚯</span> Loading<span><slot name="progress"></slot></span></slot></p><pre><slot name="file"></slot></pre></template>`)
+}</style><p><slot name="message"><span style="line-height: .707em; width: .707em; display: inline-block; animation: spin 1.0s infinite linear;">⏳</span> Loading<span><slot name="progress"></slot></span></slot></p><pre><slot name="file"></slot></pre></template>`)
 	}
 
 	return nil
