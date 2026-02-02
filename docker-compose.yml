@@ -1,6 +1,7 @@
 services:
   yolosint:
     build: .
+    image: savant42/yolosint:latest
     ports:
       - "8042:8080"
     environment:
