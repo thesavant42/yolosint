@@ -24,7 +24,7 @@ const (
 <body>
 <head>
 <title></title>
-<link rel="icon" href="/favicon.svg">
+<link rel="icon" href="/dockdork-32.png">
 <style>
 .mt:hover {
 	text-decoration: underline;
