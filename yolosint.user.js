@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         Docker Hub OCI Explorer
+// @name         yolosint dockerhub search
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.3
 // @description  Adds a button to launch OCI Explorer from Docker Hub tags and image pages
 // @author       thesavant2
 // @match        https://hub.docker.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=docker.com
+// @icon         https://raw.githubusercontent.com/thesavant42/dagdotdev/refs/heads/main/docs/favicon-60x60.png
 // @grant        none
 // ==/UserScript==
 
@@ -16,7 +16,7 @@
     const OCI_BASE_URL = "http://localhost:8042/?image=";
 
     // Small SVG Icon (Globe/Layer style) for the button
-    const ociIcon = `<img src="https://raw.githubusercontent.com/thesavant42/dagdotdev/refs/heads/main/docs/favicon-57x57.png" style="width:16px;height:16px;" alt="OCI Explorer"/>`;
+    const ociIcon = `<img src="https://raw.githubusercontent.com/thesavant42/dagdotdev/refs/heads/main/docdork-32.png" alt="Docker Dorker"/>`;
 
     /**
      * Creates the styled button element
@@ -26,33 +26,24 @@
         btn.href = url;
         btn.target = '_blank';
         btn.innerHTML = ociIcon;
-        btn.title = "Inspect in OCI Explorer";
-        // Styling to match DockerHub's clean aesthetic
+        btn.title = "Inspect in Docker Dorker";
+        // Flat button styling
         btn.style.cssText = `
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-left: 8px;
-            color: #09b3af; /* Docker Hub Tealish color or similar */
             text-decoration: none;
             vertical-align: middle;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 2px 4px;
-            background: white;
-            transition: all 0.2s ease-in-out;
-            opacity: 0.8;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out;
         `;
 
         btn.onmouseover = () => {
-            btn.style.background = '#f0faff';
             btn.style.opacity = '1';
-            btn.style.borderColor = '#09b3af';
         };
         btn.onmouseout = () => {
-            btn.style.background = 'white';
-            btn.style.opacity = '0.8';
-            btn.style.borderColor = '#e0e0e0';
+            btn.style.opacity = '0.7';
         };
         return btn;
     }
