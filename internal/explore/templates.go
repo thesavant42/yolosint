@@ -139,8 +139,6 @@ Search Docker Hub:
 }
 
 .crane {
-	height: 1em;
-	width: 1em;
 }
 
 .top {
@@ -195,8 +193,6 @@ If you trust <a class="mt" href="https://github.com/jonjohnsonjr">me</a>, click 
 }
 
 .crane {
-	height: 1em;
-	width: 1em;
 }
 
 .top {
