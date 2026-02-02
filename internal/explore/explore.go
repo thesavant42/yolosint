@@ -1650,6 +1650,7 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 	// Add save link for files (not directories)
 	if !stat.IsDir() {
 		header.SaveURL = r.URL.Path + "?dl=1"
+		header.Filename = filename
 	}
 
 	if err := bodyTmpl.Execute(w, header); err != nil {

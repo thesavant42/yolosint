@@ -234,6 +234,7 @@ td {
 {{if $.Subject}}<tr><td>OCI-Subject</td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr>{{end}}
 </table>
 {{end}}
+{{if .Filename}}<h3>{{.Filename}}</h3>{{end}}
 </div>
 `
 
@@ -278,4 +279,5 @@ type HeaderData struct {
 	Referrers        bool
 	Subject          string
 	SaveURL          string
+	Filename         string
 }
