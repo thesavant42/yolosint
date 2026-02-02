@@ -160,7 +160,7 @@ body {
 }
 </style>
 </head>
-<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link"></span></a></h1>
+<h1><a class="top" href="/"><img class="crane" src="/docdork-32.png"/> <span class="link"></span></a></h1>
 <p>
 It looks like we encountered an auth error:
 </p>
@@ -234,7 +234,7 @@ td {
 	bodyTemplate = `
 <body>
 <div>
-<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link"></span></a>{{if .SaveURL}}<a href="{{.SaveURL}}"><img class="crane" src="/save-32.jpg" alt="save" title="Download file"/></a>{{end}}</h1>
+<h1><a class="top" href="/"><img class="crane" src="/docdork-32.png"/> <span class="link"></span></a>{{if .SaveURL}}<a href="{{.SaveURL}}"><img class="crane" src="/save-32.jpg" alt="save" title="Download file"/></a>{{end}}</h1>
 {{ if .Up }}
 <h2>{{ if and (ne .Up.Parent "docker.io") (ne .Up.Parent "index.docker.io") }}<a class="mt" href="/?repo={{.Up.Parent}}">{{.Up.Parent}}</a>{{else}}{{.Up.Parent}}{{end}}{{.Up.Separator}}{{if .RefHandler }}<a class="mt" href="/{{.RefHandler}}{{.Reference}}{{if .EscapedMediaType}}{{.QuerySep}}mt={{.EscapedMediaType}}{{end}}">{{.Up.Child}}</a>{{else}}{{.Up.Child}}{{end}}{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}</h2>
 {{ else }}
