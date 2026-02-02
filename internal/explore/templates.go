@@ -41,8 +41,6 @@ const (
 }
 
 .crane {
-	height: 1em;
-	width: 1em;
 }
 
 .top {
