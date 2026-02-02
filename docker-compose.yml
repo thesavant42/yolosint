@@ -7,8 +7,5 @@ services:
       - PORT=8080
       - CACHE_DIR=/cache
     volumes:
-      - oci-cache:/cache
+      - ./cache:/cache
     restart: unless-stopped
-
-volumes:
-  oci-cache:

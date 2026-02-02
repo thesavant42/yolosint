@@ -1,3 +1,4 @@
 
 dist/
 /pkg/forks/github.com
+cache/
