@@ -61,6 +61,20 @@ body {
 	padding: 12px;
 }
 
+details > summary {
+	list-style: none;
+	cursor: pointer;
+}
+details > summary::before {
+	content: "> ";
+}
+details[open] > summary::before {
+	content: "v ";
+}
+details > summary::-webkit-details-marker {
+	display: none;
+}
+
 </style>
 </head>
 <h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link"></span></a></h1>
@@ -88,7 +102,8 @@ Search Docker Hub:
 <input type="submit" value="Search"/>
 </form>
 <p>
-<h4>Interesting examples</h4>
+<details>
+<summary>Interesting examples</summary>
 <ul>
   <li><a href="/?image=gcr.io/distroless/static">gcr.io/distroless/static:latest</a></li>
   <li><a href="/?repo=ghcr.io/homebrew/core/crane">ghcr.io/homebrew/core/crane</a></li>
@@ -98,7 +113,7 @@ Search Docker Hub:
   <li><a href="/?image=tianon/true:oci">tianon/true:oci</a></li>
   <li><a href="/?image=ghcr.io/stargz-containers/node:13.13.0-esgz">ghcr.io/stargz-containers/node:13.13.0-esgz</a></li>
 </ul>
-</p>
+</details>
 <p>
 </body>
 </html>
