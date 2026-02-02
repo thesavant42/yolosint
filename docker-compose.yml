@@ -1,0 +1,14 @@
+services:
+  yolosint:
+    build: .
+    ports:
+      - "8042:8080"
+    environment:
+      - PORT=8080
+      - CACHE_DIR=/cache
+    volumes:
+      - oci-cache:/cache
+    restart: unless-stopped
+
+volumes:
+  oci-cache:
