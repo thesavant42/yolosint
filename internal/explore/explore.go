@@ -14,9 +14,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -165,22 +163,30 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path == "/favicon.svg" || r.URL.Path == "/favicon.ico" {
 		w.Header().Set("Cache-Control", "max-age=3600")
-		http.ServeFile(w, r, filepath.Join(os.Getenv("KO_DATA_PATH"), "favicon.svg"))
+		data, _ := Assets.ReadFile("assets/favicon.svg")
+		w.Header().Set("Content-Type", "image/svg+xml")
+		w.Write(data)
 		return
 	}
 	if r.URL.Path == "/save-32.jpg" {
 		w.Header().Set("Cache-Control", "max-age=3600")
-		http.ServeFile(w, r, filepath.Join(os.Getenv("KO_DATA_PATH"), "save-32.jpg"))
+		data, _ := Assets.ReadFile("assets/save-32.jpg")
+		w.Header().Set("Content-Type", "image/jpeg")
+		w.Write(data)
 		return
 	}
 	if r.URL.Path == "/docdork-32.png" {
 		w.Header().Set("Cache-Control", "max-age=3600")
-		http.ServeFile(w, r, filepath.Join(os.Getenv("KO_DATA_PATH"), "docdork-32.png"))
+		data, _ := Assets.ReadFile("assets/docdork-32.png")
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(data)
 		return
 	}
 	if r.URL.Path == "/robots.txt" {
 		w.Header().Set("Cache-Control", "max-age=3600")
-		http.ServeFile(w, r, filepath.Join(os.Getenv("KO_DATA_PATH"), "robots.txt"))
+		data, _ := Assets.ReadFile("assets/robots.txt")
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write(data)
 		return
 	}
 

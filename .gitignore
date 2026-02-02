@@ -2,3 +2,6 @@
 dist/
 /pkg/forks/github.com
 cache/
+oci
+*.exe
+

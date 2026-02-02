@@ -1,0 +1,13 @@
+.git/
+.github/
+cache/
+plans/
+docs/
+*.md
+.goreleaser.yaml
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+oci
+oci.exe
