@@ -207,7 +207,7 @@ If you trust <a class="mt" href="https://github.com/jonjohnsonjr">me</a>, click 
 body {
 	font-family: monospace;
 	width: fit-content;
-	overflow-wrap: anywhere;
+	overflow-wrap: break-word;
 	padding: 12px;
 }
 
@@ -221,6 +221,10 @@ pre {
 
 td {
 	vertical-align: top;
+}
+
+td:first-child {
+	white-space: nowrap;
 }
 
 </style>
