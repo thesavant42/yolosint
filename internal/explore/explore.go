@@ -168,6 +168,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(os.Getenv("KO_DATA_PATH"), "favicon.svg"))
 		return
 	}
+	if r.URL.Path == "/save-32.jpg" {
+		w.Header().Set("Cache-Control", "max-age=3600")
+		http.ServeFile(w, r, filepath.Join(os.Getenv("KO_DATA_PATH"), "save-32.jpg"))
+		return
+	}
 	if r.URL.Path == "/robots.txt" {
 		w.Header().Set("Cache-Control", "max-age=3600")
 		http.ServeFile(w, r, filepath.Join(os.Getenv("KO_DATA_PATH"), "robots.txt"))
