@@ -32,4 +32,16 @@ go build ./cmd/oci
 ./oci -v
 ```
 
-Opens a listener on port localhost:8080 but I forward this to port 8042 in Docker. That aligns with the url on line 16 of [DockerHubOCI Explorer-1.1.user.js](/DockerHubOCI Explorer-1.1.user.js)
+Opens a listener on port *localhost:8080*, **but I forward this to port 8042** in Docker.
+    - That aligns with the url on line 16 of [DockerHubOCI yolosint.user.js](/DockerHubOCI Explorer-1.1.user.js)
+
+## Cached Files
+Stored in the [./cache/](./cache/) folder.
+
+## User Script
+- `yolosint.user.js` is a user script written for Tampermonkey, ymmv.
+- Adds an overlay when viewing docker hub to quickly view a container image in docker dorker. 
+- To use after installing, simply browse an image in Docker Hub and click the "Tags" tab to view details about recent tags for that Repository.
+- The overlay will be displayed nexted to the Tag ID.
+
+
