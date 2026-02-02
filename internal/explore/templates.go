@@ -80,6 +80,7 @@ Enter a <strong>public</strong> repository, e.g. <tt>"ubuntu"</tt>:
 <input type="submit" />
 </form>
 <p>
+Search Docker Hub:
 <p>	
 </p>
 <form action="https://hub.docker.com/search" method="GET" autocomplete="off" spellcheck="false">
