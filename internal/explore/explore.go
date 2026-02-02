@@ -1642,14 +1642,13 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 	}
 	header.SizeLink = fmt.Sprintf("/size/%s?mt=%s&size=%d", ref.Context().Digest(hash.String()).String(), mediaType, int64(size))
 
-	if err := bodyTmpl.Execute(w, header); err != nil {
-		return err
-	}
-
 	// Add save link for files (not directories)
 	if !stat.IsDir() {
-		saveURL := r.URL.Path + "?dl=1"
-		fmt.Fprintf(w, `<p><a href="%s">save</a></p>`, saveURL)
+		header.SaveURL = r.URL.Path + "?dl=1"
+	}
+
+	if err := bodyTmpl.Execute(w, header); err != nil {
+		return err
 	}
 
 	if _, ok := f.(httpserve.Files); ok {
