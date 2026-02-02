@@ -16,7 +16,7 @@
     const OCI_BASE_URL = "http://localhost:8042/?image=";
 
     // Small SVG Icon (Globe/Layer style) for the button
-    const ociIcon = `<img src="http://localhost:8042/favicon-57x57.png" style="width:16px;height:16px;" alt="OCI Explorer"/>`;
+    const ociIcon = `<img src="https://raw.githubusercontent.com/thesavant42/dagdotdev/refs/heads/main/docs/favicon-57x57.png" style="width:16px;height:16px;" alt="OCI Explorer"/>`;
 
     /**
      * Creates the styled button element
