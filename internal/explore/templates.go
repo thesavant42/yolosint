@@ -24,7 +24,7 @@ const (
 <body>
 <head>
 <title></title>
-<link rel="icon" href="/dockdork-32.png">
+<link rel="icon" href="/favicon.svg">
 <style>
 .mt:hover {
 	text-decoration: underline;
@@ -77,7 +77,7 @@ details > summary::-webkit-details-marker {
 
 </style>
 </head>
-<h1><a class="top" href="/"><img class="crane" src="/favicon.svg"/> <span class="link"></span></a></h1>
+<h1><a class="top" href="/"><img class="crane" src="/dockdork-32.png"/> <span class="link"></span></a></h1>
 <p>
 Enter a <strong>public</strong> image, e.g. <tt>"ubuntu:latest"</tt>:
 </p>
