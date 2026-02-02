@@ -1,5 +1,7 @@
 # Docker Dorker - YOLOSINT Container Module 
 
+![logo](/docs/128-cropped-scaled-banner-001.png)
+
 Forked from and Inspired by [https://github.com/jonjohnsonjr/dagdotdev](https://github.com/jonjohnsonjr/dagdotdev)
 
 ## Docker Dorker
