@@ -92,7 +92,7 @@ Enter a <strong>public</strong> repository, e.g. <tt>"ubuntu"</tt>:
 <input type="submit" />
 </form>
 <p>
-Search Docker Hub:
+Search <a href="https://hub.docker.com">Docker Hub</a>
 <p>	
 </p>
 <form action="https://hub.docker.com/search" method="GET" autocomplete="off" spellcheck="false">
@@ -109,7 +109,7 @@ Search Docker Hub:
   <li><a href="/?image=registry.k8s.io/bom/bom:sha256-499bdf4cc0498bbfb2395f8bbaf3b7e9e407cca605aecc46b2ef1b390a0bc4c4.sig">registry.k8s.io/bom/bom:sha256-499bdf4cc0498bbfb2395f8bbaf3b7e9e407cca605aecc46b2ef1b390a0bc4c4.sig</a></li>
   <li><a href="/?image=docker/dockerfile:1.5.1">docker/dockerfile:1.5.1</a></li>
   <li><a href="/?image=tianon/true:oci">tianon/true:oci</a></li>
-  <li><a href="/?image=ghcr.io/stargz-containers/node:13.13.0-esgz">ghcr.io/stargz-containers/node:13.13.0-esgz</a></li>
+  <li><a href="/?image=kentico/ems:web-12.0.29">?image=kentico/ems:web-12.0.29</a></li>
 </ul>
 </details>
 <p>
