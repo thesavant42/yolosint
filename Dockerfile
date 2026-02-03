@@ -8,4 +8,8 @@ RUN CGO_ENABLED=0 go build -o /oci ./cmd/oci
 FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /oci /oci
+
+# Run as non-root user (65532 is the nonroot user in distroless/static)
+USER 65532:65532
+
 ENTRYPOINT ["/oci"]
