@@ -236,9 +236,9 @@ td:first-child {
 <div>
 <h1><a class="top" href="/"><img class="crane" src="/docdork-32.png"/> <span class="link"></span></a>{{if .SaveURL}}<a href="{{.SaveURL}}"><img class="crane" src="/save-32.jpg" alt="save" title="Download file"/></a>{{end}}</h1>
 {{ if .Up }}
-<h2>{{ if and (ne .Up.Parent "docker.io") (ne .Up.Parent "index.docker.io") }}<a class="mt" href="/?repo={{.Up.Parent}}">{{.Up.Parent}}</a>{{else}}{{.Up.Parent}}{{end}}{{.Up.Separator}}{{if .RefHandler }}<a class="mt" href="/{{.RefHandler}}{{.Reference}}{{if .EscapedMediaType}}{{.QuerySep}}mt={{.EscapedMediaType}}{{end}}">{{.Up.Child}}</a>{{else}}{{.Up.Child}}{{end}}{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}</h2>
+<p><strong>{{ if and (ne .Up.Parent "docker.io") (ne .Up.Parent "index.docker.io") }}<a class="mt" href="/?repo={{.Up.Parent}}">{{.Up.Parent}}</a>{{else}}{{.Up.Parent}}{{end}}{{.Up.Separator}}{{if .RefHandler }}<a class="mt" href="/{{.RefHandler}}{{.Reference}}{{if .EscapedMediaType}}{{.QuerySep}}mt={{.EscapedMediaType}}{{end}}">{{.Up.Child}}</a>{{else}}{{.Up.Child}}{{end}}</strong>{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}{{if .DockerPull}} <span style="background:#2a2a3e;padding:4px 8px;border-radius:4px;margin-left:8px;border:1px solid #444;">docker pull {{.DockerPull}} <button onclick="navigator.clipboard.writeText('docker pull {{.DockerPull}}')" style="background:#444;color:inherit;border:1px solid #666;padding:2px 6px;border-radius:4px;cursor:pointer;margin-left:4px;font:inherit;">Copy</button></span>{{end}}</p>
 {{ else }}
-	<h2>{{.Reference}}{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}</h2>
+	<p><strong>{{.Reference}}</strong>{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}{{if .DockerPull}} <span style="background:#2a2a3e;padding:4px 8px;border-radius:4px;margin-left:8px;border:1px solid #444;">docker pull {{.DockerPull}} <button onclick="navigator.clipboard.writeText('docker pull {{.DockerPull}}')" style="background:#444;color:inherit;border:1px solid #666;padding:2px 6px;border-radius:4px;cursor:pointer;margin-left:4px;font:inherit;">Copy</button></span>{{end}}</p>
 {{ end }}
 {{ if .Descriptor }}
 <table>
@@ -294,4 +294,5 @@ type HeaderData struct {
 	Subject          string
 	SaveURL          string
 	Filename         string
+	DockerPull       string
 }

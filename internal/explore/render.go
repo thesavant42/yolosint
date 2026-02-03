@@ -362,8 +362,8 @@ func renderJSON(w *jsonOutputter, b []byte) error {
 func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	image := w.u.Query().Get("image")
 
-	// Config table
-	w.Print(`<h3>config</h3><table>`)
+	// Config line (single line with digest hyperlink)
+	w.Print(`<p><strong>config</strong>`)
 	if cfg, ok := m["config"].(map[string]interface{}); ok {
 		digest := ""
 		size := int64(0)
@@ -382,15 +382,15 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 		if strings.Contains(handler, "?") {
 			qs = "&"
 		}
-		w.Printf(`<tr><td>%s</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td></tr>`,
+		w.Printf(`&nbsp;&nbsp;%s <a href="/%s%s@%s%smt=%s&size=%d">%s</a>`,
 			humanize.IBytes(uint64(size)), handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 	}
-	w.Print(`</table>`)
+	w.Print(`</p>`)
 
-	// Layers table
-	w.Print(`<h3><a href="/layers/` + image + `/">layers</a></h3><table>`)
+	// Layers section with labels
+	w.Print(`<table><tr><td></td><td><strong>LIST VIEW:</strong></td><td></td><td><strong>LAYERS VIEW</strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td></tr>`)
 	if layers, ok := m["layers"].([]interface{}); ok {
-		for _, l := range layers {
+		for i, l := range layers {
 			if layer, ok := l.(map[string]interface{}); ok {
 				digest := ""
 				size := int64(0)
@@ -409,9 +409,11 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				if strings.Contains(handler, "?") {
 					qs = "&"
 				}
-				// Size links to /size/ view, digest links to /fs/ view
-				w.Printf(`<tr><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td></tr>`,
+				// Two index columns: one before size, one before digest
+				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td></tr>`,
+					i+1,
 					w.repo, digest, url.QueryEscape(mt), size, humanize.IBytes(uint64(size)),
+					i+1,
 					handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 			}
 		}
