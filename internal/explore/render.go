@@ -362,8 +362,8 @@ func renderJSON(w *jsonOutputter, b []byte) error {
 func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	image := w.u.Query().Get("image")
 
-	// Config line (single line with digest hyperlink)
-	w.Print(`<p><strong>config</strong>`)
+	// Config row (aligned with digest table above: label, size, sha256)
+	w.Print(`<table><tr><td><strong>config</strong></td><td>`)
 	if cfg, ok := m["config"].(map[string]interface{}); ok {
 		digest := ""
 		size := int64(0)
@@ -382,13 +382,13 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 		if strings.Contains(handler, "?") {
 			qs = "&"
 		}
-		w.Printf(`&nbsp;&nbsp;%s <a href="/%s%s@%s%smt=%s&size=%d">%s</a>`,
+		w.Printf(`%s</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a>`,
 			humanize.IBytes(uint64(size)), handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 	}
-	w.Print(`</p>`)
+	w.Print(`</td></tr></table>`)
 
 	// Layers section with labels
-	w.Print(`<table><tr><td></td><td><strong>LIST VIEW:</strong></td><td></td><td><strong>LAYERS VIEW</strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td></tr>`)
+	w.Print(`<table><tr><td colspan="2"><strong>LIST VIEW:</strong></td><td colspan="2"><strong>LAYERS VIEW</strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td></tr>`)
 	if layers, ok := m["layers"].([]interface{}); ok {
 		for i, l := range layers {
 			if layer, ok := l.(map[string]interface{}); ok {
