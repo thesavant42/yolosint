@@ -2,7 +2,6 @@ package explore
 
 import (
 	"database/sql"
-	"os"
 	"sync"
 	"time"
 
@@ -19,13 +18,6 @@ type TocDB struct {
 }
 
 func OpenTocDB() (*TocDB, error) {
-	// Create the database file if it does not exist
-	f, err := os.OpenFile("/cache/log.db", os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		return nil, err
-	}
-	f.Close()
-
 	db, err := sql.Open("sqlite", "/cache/log.db")
 	if err != nil {
 		return nil, err

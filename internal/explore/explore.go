@@ -112,10 +112,9 @@ func New(opts ...Option) http.Handler {
 	}
 	db, err := OpenTocDB()
 	if err != nil {
-		log.Printf("failed to open /cache/log.db: %v", err)
-	} else {
-		h.tocDB = db
+		log.Fatalf("failed to open /cache/log.db: %v", err)
 	}
+	h.tocDB = db
 
 	for _, opt := range opts {
 		opt(&h)
