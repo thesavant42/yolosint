@@ -17,8 +17,8 @@ type TocDB struct {
 	mu sync.Mutex
 }
 
-func OpenTocDB(path string) (*TocDB, error) {
-	db, err := sql.Open("sqlite", "file:"+path+"?mode=rwc")
+func OpenTocDB() (*TocDB, error) {
+	db, err := sql.Open("sqlite", "/cache/log.db")
 	if err != nil {
 		return nil, err
 	}

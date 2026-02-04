@@ -1,64 +1,46 @@
-# Fix: Hardcode Cache and SQLite Paths
+# SQLite Fix Plan
 
-## The Problem
+## File: internal/explore/sqlitedb.go
 
-Container fails because SQLite cannot create `/cache/log.db` when the path is derived from environment variables incorrectly.
+### Current Code (Lines 20-24)
 
-## The Fix
-
-### 1. explore.go - SQLite Initialization
-
-**Current broken code at line 111:**
 ```go
-if cd := os.Getenv("CACHE_DIR"); cd != "" {
-    db, err := OpenTocDB(filepath.Join(cd, "log.db"))
+func OpenTocDB(path string) (*TocDB, error) {
+	db, err := sql.Open("sqlite", "file:"+path+"?mode=rwc")
+	if err != nil {
+		return nil, err
+	}
 ```
 
-**Replace with:**
+### Replacement Code (Lines 20-24)
+
 ```go
-if err := os.MkdirAll("/cache", 0755); err != nil {
-    log.Printf("failed to create /cache: %v", err)
-}
+func OpenTocDB() (*TocDB, error) {
+	db, err := sql.Open("sqlite", "/cache/log.db")
+	if err != nil {
+		return nil, err
+	}
+```
+
+### Changes
+
+1. Line 20: Remove `path string` parameter from function signature
+2. Line 21: Replace `"file:"+path+"?mode=rwc"` with `"/cache/log.db"`
+
+## File: internal/explore/explore.go
+
+### Current Code (Around Line 113)
+
+```go
 db, err := OpenTocDB("/cache/log.db")
-if err != nil {
-    log.Printf("failed to open /cache/log.db: %v", err)
-} else {
-    h.tocDB = db
-}
 ```
 
-### 2. cache.go - buildTocCache()
+### Replacement Code
 
-**Current broken code at line 638:**
 ```go
-if cd := os.Getenv("CACHE_DIR"); cd != "" {
-    caches = append(caches, &dirCache{dir: cd})
-}
+db, err := OpenTocDB()
 ```
 
-**Replace with:**
-```go
-caches = append(caches, &dirCache{dir: "/cache"})
-```
+### Changes
 
-### 3. cache.go - buildIndexCache()
-
-**Current broken code at line 648:**
-```go
-if cd := os.Getenv("CACHE_DIR"); cd != "" {
-```
-
-**Replace with:**
-```go
-caches = append(caches, &dirCache{dir: "/cache"})
-```
-
-## Summary
-
-| Location | Remove | Replace With |
-|----------|--------|--------------|
-| explore.go:111 | `os.Getenv("CACHE_DIR")` conditional | `os.MkdirAll("/cache", 0755)` + hardcoded `/cache/log.db` |
-| cache.go:638 | `os.Getenv("CACHE_DIR")` conditional | Hardcoded `/cache` |
-| cache.go:648 | `os.Getenv("CACHE_DIR")` conditional | Hardcoded `/cache` |
-
-The SQLite driver with `mode=rwc` creates the file. We just need `os.MkdirAll` to ensure `/cache` directory exists first.
+1. Remove the argument from the OpenTocDB call
