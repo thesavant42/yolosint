@@ -19,10 +19,10 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/crane"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/google"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/crane"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/google"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
 // Option is a functional option for gcrane operations.

@@ -20,7 +20,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/crane"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/crane"
 )
 
 func TestLayer(t *testing.T) {

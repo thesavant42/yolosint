@@ -19,7 +19,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
 )
 
 const ghcrHostname = "ghcr.io"

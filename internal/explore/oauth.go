@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote/transport"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote/transport"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )

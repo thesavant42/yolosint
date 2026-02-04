@@ -25,13 +25,13 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/name"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/registry"
-	v1 "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/empty"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/mutate"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/random"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/name"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/registry"
+	v1 "github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/empty"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/mutate"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/random"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
 )
 
 func TestWriteLayer_Progress(t *testing.T) {

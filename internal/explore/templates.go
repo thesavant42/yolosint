@@ -3,7 +3,7 @@ package explore
 import (
 	"text/template"
 
-	v1 "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
 )
 
 var (

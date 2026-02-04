@@ -16,10 +16,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/rsc.io/gitfs"
+	"github.com/thesavant42/yolosint/internal/forks/rsc.io/gitfs"
 	"golang.org/x/exp/maps"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/gzhttp"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/gzhttp"
 )
 
 // We should not buffer blobs greater than 2MB

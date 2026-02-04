@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/internal/soci"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 )
 
 type Cache interface {

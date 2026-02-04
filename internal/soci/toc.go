@@ -4,8 +4,8 @@ import (
 	"archive/tar"
 	"time"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/compress/flate"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/internal/forks/compress/flate"
 )
 
 type TOC struct {

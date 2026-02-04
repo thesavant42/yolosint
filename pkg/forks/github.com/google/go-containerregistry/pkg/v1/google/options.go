@@ -18,7 +18,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
 )
 
 // WithTransport is a functional option for overriding the default transport

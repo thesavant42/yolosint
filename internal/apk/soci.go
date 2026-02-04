@@ -11,10 +11,10 @@ import (
 	"net/http"
 	"strings"
 
-	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
-	"github.com/jonjohnsonjr/dagdotdev/internal/soci"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
+	httpserve "github.com/thesavant42/yolosint/internal/forks/http"
+	"github.com/thesavant42/yolosint/internal/soci"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
 )
 
 // 5 MB.

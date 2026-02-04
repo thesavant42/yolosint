@@ -20,7 +20,7 @@ package internal
 import (
 	"strings"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/name"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/name"
 )
 
 // This shouldn't compile.

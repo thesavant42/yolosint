@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
-	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
+	httpserve "github.com/thesavant42/yolosint/internal/forks/http"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
 )
 
 // More than enough for FileServer to Peek at file contents.
@@ -400,9 +400,9 @@ func (s *SociFS) dir(fm *TOCFile) fs.File {
 
 // TODO: dedupe
 const (
-	gcrane     = `<a class="mt" href="https://github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/blob/main/cmd/gcrane/README.md">gcrane</a>`
-	craneLink  = `<a class="mt" href="https://github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/blob/main/cmd/crane/README.md">crane</a>`
-	subLinkFmt = `<a class="mt" href="https://github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/blob/main/cmd/crane/doc/crane_%s.md">%s</a>`
+	gcrane     = `<a class="mt" href="https://github.com/google/go-containerregistry/blob/main/cmd/gcrane/README.md">gcrane</a>`
+	craneLink  = `<a class="mt" href="https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md">crane</a>`
+	subLinkFmt = `<a class="mt" href="https://github.com/google/go-containerregistry/blob/main/cmd/crane/doc/crane_%s.md">%s</a>`
 )
 
 func crane(sub string) string {

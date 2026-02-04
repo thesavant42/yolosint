@@ -10,8 +10,8 @@ import (
 	"hash/crc32"
 	"io"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/huff0"
-	snappy "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/internal/snapref"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/huff0"
+	snappy "github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/internal/snapref"
 )
 
 const (

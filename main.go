@@ -8,12 +8,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/gcrane"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-	"github.com/jonjohnsonjr/dagdotdev/internal/apk"
-	"github.com/jonjohnsonjr/dagdotdev/internal/explore"
-	"github.com/jonjohnsonjr/dagdotdev/internal/git"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/gcrane"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/internal/apk"
+	"github.com/thesavant42/yolosint/internal/explore"
+	"github.com/thesavant42/yolosint/internal/git"
 )
 
 var auth = flag.Bool("auth", false, "use docker credentials")

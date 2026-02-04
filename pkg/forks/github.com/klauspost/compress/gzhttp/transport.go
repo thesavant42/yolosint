@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/gzip"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/zstd"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/gzip"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/zstd"
 )
 
 // Transport will wrap a transport with a custom handler

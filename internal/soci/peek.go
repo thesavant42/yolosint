@@ -9,12 +9,12 @@ import (
 
 	ogzip "compress/gzip"
 
-	kzstd "github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/zstd"
+	kzstd "github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/zstd"
 
-	"github.com/jonjohnsonjr/dagdotdev/internal/and"
-	"github.com/jonjohnsonjr/dagdotdev/internal/gzip"
-	"github.com/jonjohnsonjr/dagdotdev/internal/zstd"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/internal/and"
+	"github.com/thesavant42/yolosint/internal/gzip"
+	"github.com/thesavant42/yolosint/internal/zstd"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 )
 
 const (
@@ -112,7 +112,7 @@ func zstdPeek(r io.Reader) (bool, PeekReader, error) {
 func checkHeader(pr PeekReader, expectedHeader []byte) (bool, PeekReader, error) {
 	header, err := pr.Peek(len(expectedHeader))
 	if err != nil {
-		// https://github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/issues/367
+		// https://github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/issues/367
 		if err == io.EOF {
 			return false, pr, nil
 		}
@@ -134,7 +134,7 @@ func tarPeek(rc io.ReadCloser) (bool, io.ReadCloser, error) {
 
 	block, err := pr.Peek(512)
 	if err != nil {
-		// https://github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/issues/367
+		// https://github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/issues/367
 		if err == io.EOF {
 			if len(block) == 0 {
 				return true, prc, nil

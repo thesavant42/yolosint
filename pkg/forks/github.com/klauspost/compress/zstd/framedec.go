@@ -10,7 +10,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/zstd/internal/xxhash"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/zstd/internal/xxhash"
 )
 
 type frameDec struct {

@@ -21,7 +21,7 @@ import (
 	"compress/gzip"
 	"io"
 
-	"github.com/jonjohnsonjr/dagdotdev/internal/and"
+	"github.com/thesavant42/yolosint/internal/and"
 )
 
 // MagicHeader is the start of gzip files.
@@ -138,7 +138,7 @@ func Peek(r io.Reader) (bool, PeekReader, error) {
 	}
 	header, err := pr.Peek(2)
 	if err != nil {
-		// https://github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/issues/367
+		// https://github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/issues/367
 		if err == io.EOF {
 			return false, pr, nil
 		}

@@ -17,7 +17,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/gzip"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/gzip"
 )
 
 var (

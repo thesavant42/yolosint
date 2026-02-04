@@ -21,7 +21,7 @@ import (
 	"compress/gzip"
 	"io"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/internal/and"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/internal/and"
 )
 
 // MagicHeader is the start of gzip files.

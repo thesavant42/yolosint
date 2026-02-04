@@ -1,4 +1,4 @@
-module github.com/jonjohnsonjr/dagdotdev
+module github.com/thesavant42/yolosint
 
 go 1.25.6
 

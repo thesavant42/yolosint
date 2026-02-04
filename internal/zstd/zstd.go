@@ -20,8 +20,8 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/jonjohnsonjr/dagdotdev/internal/and"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/zstd"
+	"github.com/thesavant42/yolosint/internal/and"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/zstd"
 )
 
 // MagicHeader is the start of zstd files.

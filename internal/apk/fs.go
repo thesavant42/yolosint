@@ -13,9 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
-	httpserve "github.com/jonjohnsonjr/dagdotdev/internal/forks/http"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types"
+	httpserve "github.com/thesavant42/yolosint/internal/forks/http"
 )
 
 // Lots of debugging that we don't want to compile into the binary.

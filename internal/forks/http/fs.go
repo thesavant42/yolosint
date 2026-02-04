@@ -29,10 +29,10 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/elf"
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/safefilepath"
-	"github.com/jonjohnsonjr/dagdotdev/internal/xxd"
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/internal/forks/elf"
+	"github.com/thesavant42/yolosint/internal/forks/safefilepath"
+	"github.com/thesavant42/yolosint/internal/xxd"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"golang.org/x/exp/slices"
 )
 

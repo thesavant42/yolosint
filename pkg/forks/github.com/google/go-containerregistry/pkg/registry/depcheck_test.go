@@ -17,7 +17,7 @@ package registry
 import (
 	"testing"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/internal/depcheck"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/internal/depcheck"
 )
 
 func TestDeps(t *testing.T) {
@@ -25,14 +25,14 @@ func TestDeps(t *testing.T) {
 		t.Skip("skipping slow depcheck")
 	}
 	depcheck.AssertOnlyDependencies(t, map[string][]string{
-		"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/registry": append(
+		"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/registry": append(
 			depcheck.StdlibPackages(),
-			"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/internal/httptest",
-			"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1",
-			"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types",
+			"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/internal/httptest",
+			"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1",
+			"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/types",
 
-			"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/internal/verify",
-			"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/internal/and",
+			"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/internal/verify",
+			"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/internal/and",
 		),
 	})
 }

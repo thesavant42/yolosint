@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/internal/and"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/internal/and"
 	"github.com/klauspost/compress/zstd"
 )
 

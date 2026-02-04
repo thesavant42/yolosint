@@ -51,7 +51,7 @@ body {
 <p>
 <h4>Interesting examples</h4>
 <ul>
-	<li><a href="/?url=https://github.com/jonjohnsonjr/dagdotdev@HEAD">github.com/jonjohnsonjr/dagdotdev</a></li>
+	<li><a href="/?url=https://github.com/thesavant42/yolosint@HEAD">github.com/thesavant42/yolosint</a></li>
 	<li><a href="/?url=https://github.com/wolfi-dev/os@HEAD">github.com/wolfi-dev/os</a></li>
 </ul>
 </p>
@@ -61,7 +61,7 @@ body {
 This service lives on <a href="https://cloud.run">Cloud Run</a> and uses (a forked version of) <a href="https://github.com/rsc/gitfs">rsc.io/gitfs</a> for git interactions.
 </p>
 <h4>Is this open source?</h4>
-<p>Yes! See <a href="/https/github.com/jonjohnsonjr/dagdotdev@HEAD/internal/git/">here</a>.</p>
+<p>Yes! See <a href="/https/github.com/thesavant42/yolosint@HEAD/internal/git/">here</a>.</p>
 <h4>But why?</h4>
 <p>GitHub truncates results if you have over 1000 files in a directory (see the wolfi example).</p>
 <p>It also takes several seconds to load every page because of the React mind virus.</p>

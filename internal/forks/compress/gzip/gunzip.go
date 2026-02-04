@@ -14,7 +14,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/compress/flate"
+	"github.com/thesavant42/yolosint/internal/forks/compress/flate"
 )
 
 const (

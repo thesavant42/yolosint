@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/klauspost/compress/zstd"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/klauspost/compress/zstd"
 
 	ogzip "compress/gzip"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-	"github.com/jonjohnsonjr/dagdotdev/internal/and"
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/compress/flate"
-	"github.com/jonjohnsonjr/dagdotdev/internal/forks/compress/gzip"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
+	"github.com/thesavant42/yolosint/internal/and"
+	"github.com/thesavant42/yolosint/internal/forks/compress/flate"
+	"github.com/thesavant42/yolosint/internal/forks/compress/gzip"
 	"golang.org/x/sync/errgroup"
 )
 

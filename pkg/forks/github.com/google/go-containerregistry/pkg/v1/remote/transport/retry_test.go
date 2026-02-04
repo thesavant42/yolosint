@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jonjohnsonjr/dagdotdev/pkg/forks/github.com/google/go-containerregistry/internal/retry"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/internal/retry"
 )
 
 type mockTransport struct {
