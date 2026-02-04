@@ -1,32 +1,3 @@
-ing# Race condition in sqlite logic causes app failure
-
-## Problem Statement
-
-The application fails and the docker container boot loops if the sqlite table does not exist (*good*) BUT **it never creates the sqlite table.**
-
----
-
-## Critical Insights 
-
-- **CRITICAL INSIGHT**: The mount volume in docker compose works fine for the cached tar.gz files; this continues to work. The directory permissions are `777`.
-- **CRITICAL INSIGHT**: when I copied over **my sqlite dev table it worked**.
-
-### Summary of Key Insights
-- On the dev machine where I had already created a sqlite table during testing, everything works.
-- But on the system that was not dev, the **fresh install**, it fails to boot **because there's no sqlite database**. 
-    - **Once I copied over my dev instance, the app worked. **
-
----
-
-- A rogue coding agent introduced the concept of using environment variables in the containers; this is explicitly forbidden.
-- The cache folder is mounted at an absolute path of `/cache` inside of the container. The `cache` folder on the host is `chmod 777`. 
-- The .tar.gz files write successfully, it's NOT an issue with permissions or the filesystem.
-- this is 100% a problem with asusming how DBs are created.
-- The sqlite database **must** be `/cache/log.db`. **The path is static, is not ever dynamic**.
-- If you see sqlite and environment variables in the same context, pause and alert me immediately. 
-- 
-- The version is modernc.org/sqlite v1.44.3 (from go.mod).
-
 # DeepWiki Q&A with Code Context for Repository: modernc-org/sqlite
 ## Q1
 how do I create a database if it doesnt exist?
@@ -142,4 +113,98 @@ do_createtable_tests 1.9 -error { %s } {
   2    "CREATE TABLE IF NOT EXISTS auxa.idx1(a, b)"   
        {{there is already an index named idx1}}
 }
+```
+## Q2
+what if the path is in the /cache/ directory? How do I create `/cache/log.db`
+### Answer
+To create `/cache/log.db` with `modernc.org/sqlite`, pass the absolute path in the DSN; the driver will create the file if it doesn’t exist. Ensure the process has write permission to `/cache/`.
+
+**Example**
+```go
+import (
+    "database/sql"
+    _ "modernc.org/sqlite"
+)
+
+func main() {
+    db, err := sql.Open("sqlite", "file:/cache/log.db")
+    if err != nil {
+        panic(err)
+    }
+    defer db.Close()
+
+    _, err = db.Exec("CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY, message TEXT)")
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+**Why this works**
+- `newConn` calls `openV2` with `SQLITE_OPEN_CREATE`, which creates the file if missing sqlite:36-63 .
+- The DSN `file:/cache/log.db` is an absolute path; SQLite resolves it directly sqlite:57-63 .
+- Tests use `filepath.Join(tempDir, "test.db")` to open databases in arbitrary directories, confirming the driver respects the provided path sqlite:2273-2285 .
+
+**Notes**
+- If `/cache/` doesn’t exist or the process lacks permissions, `openV2` will fail with “unable to open database file” sqlite:96-101 .
+- You can add pragmas to the DSN, e.g., `file:/cache/log.db?_pragma=journal_mode(WAL)` sqlite:59-72 .
+
+Wiki pages you might want to explore:
+- [Core Driver (modernc-org/sqlite)](/wiki/modernc-org/sqlite#2)
+### Citations
+**File:** conn.go (L36-63)
+```go
+func newConn(dsn string) (*conn, error) {
+	var query, vfsName string
+
+	// Parse the query parameters from the dsn and them from the dsn if not prefixed by file:
+	// https://github.com/mattn/go-sqlite3/blob/3392062c729d77820afc1f5cae3427f0de39e954/sqlite3.go#L1046
+	// https://github.com/mattn/go-sqlite3/blob/3392062c729d77820afc1f5cae3427f0de39e954/sqlite3.go#L1383
+	pos := strings.IndexRune(dsn, '?')
+	if pos >= 1 {
+		query = dsn[pos+1:]
+		var err error
+		vfsName, err = getVFSName(query)
+		if err != nil {
+			return nil, err
+		}
+
+		if !strings.HasPrefix(dsn, "file:") {
+			dsn = dsn[:pos]
+		}
+	}
+
+	c := &conn{tls: libc.NewTLS()}
+	db, err := c.openV2(
+		dsn,
+		vfsName,
+		sqlite3.SQLITE_OPEN_READWRITE|sqlite3.SQLITE_OPEN_CREATE|
+			sqlite3.SQLITE_OPEN_FULLMUTEX|
+			sqlite3.SQLITE_OPEN_URI,
+	)
+```
+**File:** all_test.go (L2273-2285)
+```go
+// https://gitlab.com/cznic/sqlite/-/issues/66
+func TestIssue66(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		os.RemoveAll(tempDir)
+	}()
+
+	fn := filepath.Join(tempDir, "testissue66.db")
+	db, err := sql.Open(driverName, fn)
+```
+**File:** testdata/tcl/oserror.test (L96-101)
+```text
+do_test 1.3.1 {
+  set ::log [list]
+  list [catch { sqlite3 dbh /x/y/z/test.db } msg] $msg
+} {1 {unable to open database file}}
+
+do_re_test 1.3.2 { lindex $::log 0 } {^os_unix.c:\d+: \(\d+\) open\(.*test.db\) - }
 ```
