@@ -78,6 +78,11 @@ func (h *handler) tryNewIndex(w http.ResponseWriter, r *http.Request, dig name.D
 			logs.Debug.Printf("nil indexer")
 			return kind, pr, tpr, err
 		}
+
+		// Set callback to log TOC to SQLite when it's written
+		idx.Key = key
+		idx.OnTOC = h.logTOC
+
 		indexer = idx
 		tr = idx
 		kind = idx.Type()
@@ -236,6 +241,11 @@ func (h *handler) createIndex(ctx context.Context, rc io.ReadCloser, size int64,
 	if indexer == nil {
 		return nil, nil
 	}
+
+	// Set callback to log TOC to SQLite when it's written
+	indexer.Key = key
+	indexer.OnTOC = h.logTOC
+
 	for {
 		// Make sure we hit the end.
 		_, err := indexer.Next()

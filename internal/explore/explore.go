@@ -14,7 +14,9 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -69,6 +71,7 @@ type handler struct {
 
 	tocCache   cache
 	indexCache cache
+	tocDB      *TocDB
 
 	sync.Mutex
 	sawTags  map[string][]string
@@ -104,6 +107,15 @@ func New(opts ...Option) http.Handler {
 		oauth:      buildOauth(),
 	}
 
+	// Initialize SQLite for TOC logging
+	if cd := os.Getenv("CACHE_DIR"); cd != "" {
+		db, err := OpenTocDB(filepath.Join(cd, "log.db"))
+		if err != nil {
+			log.Fatalf("failed to open log.db: %v", err)
+		}
+		h.tocDB = db
+	}
+
 	for _, opt := range opts {
 		opt(&h)
 	}
@@ -133,6 +145,15 @@ func New(opts ...Option) http.Handler {
 	h.mux = gzhttp.GzipHandler(mux)
 
 	return &h
+}
+
+// logTOC is the callback for Indexer.OnTOC - logs TOC data to SQLite
+func (h *handler) logTOC(key string, toc *soci.TOC) {
+	if h.tocDB != nil {
+		if err := h.tocDB.Insert(key, toc); err != nil {
+			log.Printf("SQLite insert failed for %s: %v", key, err)
+		}
+	}
 }
 
 func splitFsURL(p string) (string, string, error) {
@@ -650,7 +671,7 @@ func (h *handler) renderLinks(w http.ResponseWriter, r *http.Request, links stri
 		}
 		newUrl.RawQuery = q.Encode()
 
-		log.Printf("newUrl: %q", newUrl)
+		log.Printf("newUrl: %q", newUrl.String())
 
 		href := fmt.Sprintf("<a href=%q>%s</a>", newUrl.String(), html.EscapeString(clean))
 		withHref := strings.Replace(link, clean, href, 1)

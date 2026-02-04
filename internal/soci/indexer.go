@@ -12,10 +12,10 @@ import (
 
 	ogzip "compress/gzip"
 
-	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/thesavant42/yolosint/internal/and"
 	"github.com/thesavant42/yolosint/internal/forks/compress/flate"
 	"github.com/thesavant42/yolosint/internal/forks/compress/gzip"
+	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -34,6 +34,11 @@ type Indexer struct {
 	cw       *countWriter
 	finished bool
 	written  bool
+
+	// OnTOC is called with the digest key and TOC when TOC is finalized.
+	// Set by caller before calling TOC().
+	OnTOC func(key string, toc *TOC)
+	Key   string // Digest key for this index
 }
 
 // Returns:
@@ -202,6 +207,11 @@ func (i *Indexer) TOC() (*TOC, error) {
 	i.written = true
 	i.toc.ArchiveSize = i.cw.n
 	i.toc.Size = tocSize
+
+	// Call the TOC callback if set
+	if i.OnTOC != nil {
+		i.OnTOC(i.Key, i.toc)
+	}
 
 	return i.toc, nil
 }

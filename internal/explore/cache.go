@@ -632,7 +632,14 @@ func buildTocCache() cache {
 		maxSize:  50 * (1 << 20),
 		entryCap: 50,
 	}
-	return mc
+
+	caches := []cache{mc}
+
+	if cd := os.Getenv("CACHE_DIR"); cd != "" {
+		caches = append(caches, &dirCache{dir: cd})
+	}
+
+	return &multiCache{caches}
 }
 
 func buildIndexCache() cache {
@@ -640,7 +647,7 @@ func buildIndexCache() cache {
 
 	if cd := os.Getenv("CACHE_DIR"); cd != "" {
 		logs.Debug.Printf("CACHE_DIR=%q", cd)
-		cache := &dirCache{cd}
+		cache := &dirCache{dir: cd}
 		caches = append(caches, cache)
 	} else if cb := os.Getenv("CACHE_BUCKET"); cb != "" {
 		logs.Debug.Printf("CACHE_BUCKET=%q", cb)
