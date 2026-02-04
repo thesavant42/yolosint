@@ -18,7 +18,7 @@ type TocDB struct {
 }
 
 func OpenTocDB(path string) (*TocDB, error) {
-	db, err := sql.Open("sqlite", path)
+	db, err := sql.Open("sqlite", path+"?mode=rwc")
 	if err != nil {
 		return nil, err
 	}
