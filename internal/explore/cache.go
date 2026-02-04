@@ -635,9 +635,7 @@ func buildTocCache() cache {
 
 	caches := []cache{mc}
 
-	if cd := os.Getenv("CACHE_DIR"); cd != "" {
-		caches = append(caches, &dirCache{dir: cd})
-	}
+	caches = append(caches, &dirCache{dir: "/cache"})
 
 	return &multiCache{caches}
 }
@@ -645,17 +643,6 @@ func buildTocCache() cache {
 func buildIndexCache() cache {
 	caches := []cache{}
 
-	if cd := os.Getenv("CACHE_DIR"); cd != "" {
-		logs.Debug.Printf("CACHE_DIR=%q", cd)
-		cache := &dirCache{dir: cd}
-		caches = append(caches, cache)
-	} else if cb := os.Getenv("CACHE_BUCKET"); cb != "" {
-		logs.Debug.Printf("CACHE_BUCKET=%q", cb)
-		if cache, err := buildGcsCache(cb); err != nil {
-			logs.Debug.Printf("buildGcsCache(): %v", err)
-		} else {
-			caches = append(caches, cache)
-		}
-	}
+	caches = append(caches, &dirCache{dir: "/cache"})
 	return &multiCache{caches}
 }

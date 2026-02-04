@@ -1,43 +1,64 @@
-# SQLite Database Creation Fix Plan
+# Fix: Hardcode Cache and SQLite Paths
 
-## Problem
+## The Problem
 
-Fresh Docker install crashes. Copying dev `log.db` fixes it.
+Container fails because SQLite cannot create `/cache/log.db` when the path is derived from environment variables incorrectly.
 
-## Observed Facts
+## The Fix
 
-1. Fresh Docker install fails with boot loop
-2. Copying dev `log.db` to cache directory fixes it
-3. tar.gz caching works in same directory with 777 permissions
-4. `OpenTocDB()` has `CREATE TABLE IF NOT EXISTS` but database file is never created
+### 1. explore.go - SQLite Initialization
 
-## Root Cause
-
-The SQLite connection string lacks the `mode=rwc` parameter. By default, some SQLite drivers only open existing files. The `rwc` mode explicitly tells SQLite to **Read, Write, and Create** the database file if it does not exist.
-
-## Solution
-
-Add `?mode=rwc` to the SQLite connection string. This is the proper SQLite way to enable auto-creation - no manual file creation hacks needed.
-
-## Implementation
-
-**File:** `internal/explore/sqlitedb.go`
-
-### Single Change: Modify the sql.Open() call
-
-**Current:**
+**Current broken code at line 111:**
 ```go
-db, err := sql.Open("sqlite", path)
+if cd := os.Getenv("CACHE_DIR"); cd != "" {
+    db, err := OpenTocDB(filepath.Join(cd, "log.db"))
 ```
 
-**Change to:**
+**Replace with:**
 ```go
-db, err := sql.Open("sqlite", path+"?mode=rwc")
+if err := os.MkdirAll("/cache", 0755); err != nil {
+    log.Printf("failed to create /cache: %v", err)
+}
+db, err := OpenTocDB("/cache/log.db")
+if err != nil {
+    log.Printf("failed to open /cache/log.db: %v", err)
+} else {
+    h.tocDB = db
+}
 ```
 
-The `mode=rwc` parameter tells SQLite to:
-- **r** = read
-- **w** = write
-- **c** = create if not exists
+### 2. cache.go - buildTocCache()
 
-This is the standard SQLite URI parameter for file creation. No additional imports or file manipulation needed.
+**Current broken code at line 638:**
+```go
+if cd := os.Getenv("CACHE_DIR"); cd != "" {
+    caches = append(caches, &dirCache{dir: cd})
+}
+```
+
+**Replace with:**
+```go
+caches = append(caches, &dirCache{dir: "/cache"})
+```
+
+### 3. cache.go - buildIndexCache()
+
+**Current broken code at line 648:**
+```go
+if cd := os.Getenv("CACHE_DIR"); cd != "" {
+```
+
+**Replace with:**
+```go
+caches = append(caches, &dirCache{dir: "/cache"})
+```
+
+## Summary
+
+| Location | Remove | Replace With |
+|----------|--------|--------------|
+| explore.go:111 | `os.Getenv("CACHE_DIR")` conditional | `os.MkdirAll("/cache", 0755)` + hardcoded `/cache/log.db` |
+| cache.go:638 | `os.Getenv("CACHE_DIR")` conditional | Hardcoded `/cache` |
+| cache.go:648 | `os.Getenv("CACHE_DIR")` conditional | Hardcoded `/cache` |
+
+The SQLite driver with `mode=rwc` creates the file. We just need `os.MkdirAll` to ensure `/cache` directory exists first.

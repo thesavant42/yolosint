@@ -16,7 +16,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -108,11 +107,13 @@ func New(opts ...Option) http.Handler {
 	}
 
 	// Initialize SQLite for TOC logging
-	if cd := os.Getenv("CACHE_DIR"); cd != "" {
-		db, err := OpenTocDB(filepath.Join(cd, "log.db"))
-		if err != nil {
-			log.Fatalf("failed to open log.db: %v", err)
-		}
+	if err := os.MkdirAll("/cache", 0755); err != nil {
+		log.Printf("failed to create /cache: %v", err)
+	}
+	db, err := OpenTocDB("/cache/log.db")
+	if err != nil {
+		log.Printf("failed to open /cache/log.db: %v", err)
+	} else {
 		h.tocDB = db
 	}
 
