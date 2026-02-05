@@ -18,7 +18,7 @@ type TocDB struct {
 }
 
 // db, err := sql.Open("sqlite", "file:experiment.db") works
-func OpenTocDB(path string) (*TocDB, error) {
+func OpenTocDB() (*TocDB, error) {
 	db, err := sql.Open("sqlite", "file:/cache/log.db")
 	if err != nil {
 		return nil, err
