@@ -7,6 +7,8 @@ Forked from and Inspired by [https://github.com/jonjohnsonjr/dagdotdev](https://
 ## Docker Dorker
 This is a web server for exploring the contents of an OCI registry, FS style output.
 
+![lolrsaprivate](/docs/screenshots/rsapriv.png)
+
 ---
 
 ## Quick Start (Docker)
