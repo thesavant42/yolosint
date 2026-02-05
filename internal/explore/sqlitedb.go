@@ -17,39 +17,38 @@ type TocDB struct {
 	mu sync.Mutex
 }
 
-func OpenTocDB() (*TocDB, error) {
-	db, err := sql.Open("sqlite", "/cache/log.db")
+// db, err := sql.Open("sqlite", "file:experiment.db") works
+func OpenTocDB(path string) (*TocDB, error) {
+	db, err := sql.Open("sqlite", "file:/cache/log.db")
 	if err != nil {
 		return nil, err
 	}
 
-	// Why two tables: One layer has many files. FK enables "find all layers containing file X".
-	// Why indexes: idx_files_name is the primary search use case; idx_layers_digest for layer lookups.
 	schema := `
-	CREATE TABLE IF NOT EXISTS layers (
-		id INTEGER PRIMARY KEY,
-		digest TEXT NOT NULL,
-		csize INTEGER,
-		usize INTEGER,
-		type TEXT,
-		media_type TEXT,
-		indexed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-	);
-	CREATE TABLE IF NOT EXISTS files (
-		id INTEGER PRIMARY KEY,
-		layer_id INTEGER NOT NULL,
-		name TEXT NOT NULL,
-		typeflag INTEGER,
-		size INTEGER,
-		mode INTEGER,
-		mod DATETIME,
-		offset INTEGER,
-		linkname TEXT,
-		FOREIGN KEY(layer_id) REFERENCES layers(id)
-	);
-	CREATE INDEX IF NOT EXISTS idx_files_name ON files(name);
-	CREATE INDEX IF NOT EXISTS idx_layers_digest ON layers(digest);
-	`
+    CREATE TABLE IF NOT EXISTS layers (
+        id INTEGER PRIMARY KEY,
+        digest TEXT NOT NULL,
+        csize INTEGER,
+        usize INTEGER,
+        type TEXT,
+        media_type TEXT,
+        indexed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS files (
+        id INTEGER PRIMARY KEY,
+        layer_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        typeflag INTEGER,
+        size INTEGER,
+        mode INTEGER,
+        mod DATETIME,
+        offset INTEGER,
+        linkname TEXT,
+        FOREIGN KEY(layer_id) REFERENCES layers(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_files_name ON files(name);
+    CREATE INDEX IF NOT EXISTS idx_layers_digest ON layers(digest);
+    `
 	if _, err := db.Exec(schema); err != nil {
 		db.Close()
 		return nil, err
