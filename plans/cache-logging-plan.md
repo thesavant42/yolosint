@@ -1,76 +1,55 @@
-package explore
+# add logging to internal/explore/cache.go
 
-import (
-	"bytes"
-	"compress/gzip"
-	"context"
-	"encoding/json"
-	"fmt"
-	"io"
-	"log"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
-	"sync"
-	"time"
+### Plan
 
-	"cloud.google.com/go/storage"
-	"github.com/thesavant42/yolosint/internal/soci"
-	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
-)
+- Add logging before
+- Add logging after
+- Add logging during if it outputs something
 
-type Cache interface {
-	Get(context.Context, string) (*soci.TOC, error)
-	Put(context.Context, string, *soci.TOC) error
-}
+ALL functions need logging.
 
-// Streaming cache.
-type cache interface {
-	Cache
-	Size(context.Context, string) (int64, error)
-	Writer(context.Context, string) (io.WriteCloser, error)
-	Reader(context.Context, string) (io.ReadCloser, error)
-	RangeReader(ctx context.Context, key string, offset, length int64) (io.ReadCloser, error)
-	Delete(ctx context.Context, key string) error
-}
+---
 
-type cacheSeeker struct {
-	cache cache
-	key   string
-}
+## gcsCache.path (line 54)
 
-func (bs *cacheSeeker) Reader(ctx context.Context, off int64, end int64) (io.ReadCloser, error) {
-	logs.Debug.Printf("cacheSeeker.Reader(%d, %d)", off, end)
-	return bs.cache.RangeReader(ctx, bs.key, off, end-off)
-}
-
-// TODO: We can separate the TOC from the checkpoints to avoid some buffering.
-type gcsCache struct {
-	client *storage.Client
-	bucket *storage.BucketHandle
-}
-
+```go
 func (g *gcsCache) path(key string) string {
 	log.Printf("[GCS] path: key=%s", key)
 	result := path.Join("soci", strings.Replace(key, ":", "-", 1), "toc.json.gz")
 	log.Printf("[GCS] path: result=%s", result)
 	return result
 }
+```
 
+---
+
+## gcsCache.treePath (line 58)
+
+```go
 func (g *gcsCache) treePath(key string) string {
 	log.Printf("[GCS] treePath: key=%s", key)
 	result := path.Join("soci", strings.Replace(key, ":", "-", 1)) + ".tar.gz"
 	log.Printf("[GCS] treePath: result=%s", result)
 	return result
 }
+```
 
+---
+
+## gcsCache.object (line 62)
+
+```go
 func (g *gcsCache) object(key string) *storage.ObjectHandle {
 	log.Printf("[GCS] object: key=%s", key)
 	return g.bucket.Object(g.path(key))
 }
+```
 
-// TODO: Use lifecycle with bumping timestamps to evict old data.
+---
+
+## gcsCache.Get (line 67)
+
+```go
 func (g *gcsCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	log.Printf("[GCS] Get: START key=%s", key)
 	if debug {
@@ -103,7 +82,13 @@ func (g *gcsCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	log.Printf("[GCS] Get: AFTER json.Decode err=nil")
 	return toc, nil
 }
+```
 
+---
+
+## gcsCache.Put (line 92)
+
+```go
 func (g *gcsCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	log.Printf("[GCS] Put: START key=%s", key)
 	if debug {
@@ -140,22 +125,46 @@ func (g *gcsCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	log.Printf("[GCS] Put: AFTER w.Close err=%v", err)
 	return err
 }
+```
 
+---
+
+## gcsCache.Writer (line 120)
+
+```go
 func (g *gcsCache) Writer(ctx context.Context, key string) (io.WriteCloser, error) {
 	log.Printf("[GCS] Writer: key=%s", key)
 	return g.bucket.Object(g.treePath(key)).NewWriter(ctx), nil
 }
+```
 
+---
+
+## gcsCache.Reader (line 124)
+
+```go
 func (g *gcsCache) Reader(ctx context.Context, key string) (io.ReadCloser, error) {
 	log.Printf("[GCS] Reader: key=%s", key)
 	return g.bucket.Object(g.treePath(key)).NewReader(ctx)
 }
+```
 
+---
+
+## gcsCache.RangeReader (line 128)
+
+```go
 func (g *gcsCache) RangeReader(ctx context.Context, key string, offset, length int64) (io.ReadCloser, error) {
 	log.Printf("[GCS] RangeReader: key=%s offset=%d length=%d", key, offset, length)
 	return g.bucket.Object(g.treePath(key)).NewRangeReader(ctx, offset, length)
 }
+```
 
+---
+
+## gcsCache.Size (line 132)
+
+```go
 func (g *gcsCache) Size(ctx context.Context, key string) (int64, error) {
 	log.Printf("[GCS] Size: START key=%s", key)
 	if debug {
@@ -173,7 +182,13 @@ func (g *gcsCache) Size(ctx context.Context, key string) (int64, error) {
 	log.Printf("[GCS] Size: size=%d", attrs.Size)
 	return attrs.Size, nil
 }
+```
 
+---
+
+## gcsCache.Delete (line 146)
+
+```go
 func (g *gcsCache) Delete(ctx context.Context, key string) error {
 	log.Printf("[GCS] Delete: key=%s", key)
 	log.Printf("[GCS] Delete: BEFORE Delete")
@@ -181,11 +196,13 @@ func (g *gcsCache) Delete(ctx context.Context, key string) error {
 	log.Printf("[GCS] Delete: AFTER Delete err=%v", err)
 	return err
 }
+```
 
-type dirCache struct {
-	dir string
-}
+---
 
+## dirCache.file (line 154)
+
+```go
 func (d *dirCache) file(key string) string {
 	log.Printf("[CACHE] file: key=%s dir=%s", key, d.dir)
 	sanitized := strings.Replace(key, ":", "-", 1)
@@ -194,7 +211,13 @@ func (d *dirCache) file(key string) string {
 	log.Printf("[CACHE] file: result=%s", result)
 	return result
 }
+```
 
+---
+
+## dirCache.Get (line 160)
+
+```go
 func (d *dirCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	path := d.file(key) + ".toc.json.gz"
 	log.Printf("[CACHE] Get: BEFORE os.Open path=%s", path)
@@ -220,7 +243,13 @@ func (d *dirCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	log.Printf("[CACHE] Get: AFTER json.Decode err=nil")
 	return toc, nil
 }
+```
 
+---
+
+## dirCache.Put (line 178)
+
+```go
 func (d *dirCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	path := d.file(key) + ".toc.json.gz"
 	log.Printf("[CACHE] Put: BEFORE os.OpenFile path=%s", path)
@@ -242,7 +271,13 @@ func (d *dirCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	log.Printf("[CACHE] Put: AFTER json.Encode err=%v", err)
 	return err
 }
+```
 
+---
+
+## dirCache.Writer (line 192)
+
+```go
 func (d *dirCache) Writer(ctx context.Context, key string) (io.WriteCloser, error) {
 	log.Printf("[CACHE] Writer: START dir=%s key=%s", d.dir, key)
 	pattern := strings.Replace(key, ":", "-", 1)
@@ -262,7 +297,13 @@ func (d *dirCache) Writer(ctx context.Context, key string) (io.WriteCloser, erro
 		f:   tmp,
 	}, nil
 }
+```
 
+---
+
+## dirCache.Reader (line 206)
+
+```go
 func (d *dirCache) Reader(ctx context.Context, key string) (io.ReadCloser, error) {
 	path := d.file(key) + ".tar.gz"
 	log.Printf("[CACHE] Reader: BEFORE os.Open path=%s", path)
@@ -270,7 +311,13 @@ func (d *dirCache) Reader(ctx context.Context, key string) (io.ReadCloser, error
 	log.Printf("[CACHE] Reader: AFTER os.Open err=%v", err)
 	return f, err
 }
+```
 
+---
+
+## dirCache.RangeReader (line 211)
+
+```go
 func (d *dirCache) RangeReader(ctx context.Context, key string, offset, length int64) (io.ReadCloser, error) {
 	log.Printf("[CACHE] RangeReader: key=%s offset=%d length=%d", key, offset, length)
 	if offset == 0 && length == -1 {
@@ -285,7 +332,13 @@ func (d *dirCache) RangeReader(ctx context.Context, key string, offset, length i
 	}
 	return io.NopCloser(io.NewSectionReader(f, offset, length)), nil
 }
+```
 
+---
+
+## dirCache.Size (line 222)
+
+```go
 func (d *dirCache) Size(ctx context.Context, key string) (int64, error) {
 	path := d.file(key) + ".tar.gz"
 	log.Printf("[CACHE] Size: BEFORE os.Stat path=%s", path)
@@ -297,7 +350,13 @@ func (d *dirCache) Size(ctx context.Context, key string) (int64, error) {
 	log.Printf("[CACHE] Size: size=%d", stat.Size())
 	return stat.Size(), nil
 }
+```
 
+---
+
+## dirCache.Delete (line 230)
+
+```go
 func (d *dirCache) Delete(ctx context.Context, key string) error {
 	tocPath := d.file(key) + ".toc.json.gz"
 	tarPath := d.file(key) + ".tar.gz"
@@ -309,25 +368,37 @@ func (d *dirCache) Delete(ctx context.Context, key string) error {
 	log.Printf("[CACHE] Delete: AFTER os.Remove tarPath err=%v", err2)
 	return err2
 }
+```
 
-type dirWriter struct {
-	dst      string
-	f        *os.File
-	complete bool
-}
+---
 
+## dirWriter.Write (line 242)
+
+```go
 func (d *dirWriter) Write(p []byte) (n int, err error) {
 	log.Printf("[CACHE] dirWriter.Write: BEFORE len=%d", len(p))
 	n, err = d.f.Write(p)
 	log.Printf("[CACHE] dirWriter.Write: AFTER n=%d err=%v", n, err)
 	return n, err
 }
+```
 
+---
+
+## dirWriter.Complete (line 246)
+
+```go
 func (d *dirWriter) Complete() {
 	log.Printf("[CACHE] dirWriter.Complete: setting complete=true")
 	d.complete = true
 }
+```
 
+---
+
+## dirWriter.Close (line 250)
+
+```go
 func (d *dirWriter) Close() error {
 	name := d.f.Name()
 	log.Printf("[CACHE] dirWriter.Close: name=%s complete=%v dst=%s", name, d.complete, d.dst)
@@ -351,22 +422,13 @@ func (d *dirWriter) Close() error {
 	log.Printf("[CACHE] dirWriter.Close: AFTER os.Rename err=nil")
 	return nil
 }
+```
 
-type memCache struct {
-	sync.Mutex
-	entryCap int
-	maxSize  int64
-	entries  []*cacheEntry
-}
+---
 
-type cacheEntry struct {
-	key    string
-	toc    *soci.TOC
-	buffer []byte
-	size   int64
-	access time.Time
-}
+## memCache.get (line 281)
 
+```go
 func (m *memCache) get(ctx context.Context, key string) (*cacheEntry, error) {
 	log.Printf("[MEM] get: key=%s", key)
 	m.Lock()
@@ -382,7 +444,13 @@ func (m *memCache) get(ctx context.Context, key string) (*cacheEntry, error) {
 	log.Printf("[MEM] get: not found key=%s", key)
 	return nil, io.EOF
 }
+```
 
+---
+
+## memCache.Get (line 294)
+
+```go
 func (m *memCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	log.Printf("[MEM] Get: key=%s", key)
 	e, err := m.get(ctx, key)
@@ -393,7 +461,13 @@ func (m *memCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	log.Printf("[MEM] Get: found")
 	return e.toc, nil
 }
+```
 
+---
+
+## memCache.Put (line 303)
+
+```go
 func (m *memCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	log.Printf("[MEM] Put: key=%s size=%d", key, toc.Size)
 	m.Lock()
@@ -427,7 +501,13 @@ func (m *memCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	m.entries = append(m.entries, e)
 	return nil
 }
+```
 
+---
+
+## memCache.New (line 335)
+
+```go
 func (m *memCache) New(ctx context.Context, key string) *cacheEntry {
 	log.Printf("[MEM] New: key=%s", key)
 	e := &cacheEntry{
@@ -450,30 +530,49 @@ func (m *memCache) New(ctx context.Context, key string) *cacheEntry {
 	}
 	return e
 }
+```
 
-type memWriter struct {
-	entry *cacheEntry
-	buf   *bytes.Buffer
-}
+---
 
+## memWriter.Write (line 360)
+
+```go
 func (w *memWriter) Write(p []byte) (n int, err error) {
 	log.Printf("[MEM] memWriter.Write: len=%d", len(p))
 	return w.buf.Write(p)
 }
+```
 
+---
+
+## memWriter.Close (line 364)
+
+```go
 func (w *memWriter) Close() (err error) {
 	log.Printf("[MEM] memWriter.Close: bufLen=%d", w.buf.Len())
 	w.entry.buffer = w.buf.Bytes()
 	return nil
 }
+```
 
+---
+
+## memCache.Writer (line 369)
+
+```go
 func (m *memCache) Writer(ctx context.Context, key string) (io.WriteCloser, error) {
 	log.Printf("[MEM] Writer: key=%s", key)
 	e := m.New(ctx, key)
 	mw := &memWriter{entry: e, buf: bytes.NewBuffer([]byte{})}
 	return mw, nil
 }
+```
 
+---
+
+## memCache.Reader (line 375)
+
+```go
 func (m *memCache) Reader(ctx context.Context, key string) (io.ReadCloser, error) {
 	log.Printf("[MEM] Reader: key=%s", key)
 	e, err := m.get(ctx, key)
@@ -484,7 +583,13 @@ func (m *memCache) Reader(ctx context.Context, key string) (io.ReadCloser, error
 	log.Printf("[MEM] Reader: found, bufLen=%d", len(e.buffer))
 	return io.NopCloser(bytes.NewReader(e.buffer)), nil
 }
+```
 
+---
+
+## memCache.RangeReader (line 383)
+
+```go
 func (m *memCache) RangeReader(ctx context.Context, key string, offset, length int64) (io.ReadCloser, error) {
 	log.Printf("[MEM] RangeReader: key=%s offset=%d length=%d", key, offset, length)
 	e, err := m.get(ctx, key)
@@ -501,7 +606,13 @@ func (m *memCache) RangeReader(ctx context.Context, key string, offset, length i
 	}
 	return io.NopCloser(bytes.NewReader(e.buffer[offset : offset+length])), nil
 }
+```
 
+---
+
+## memCache.Size (line 398)
+
+```go
 func (m *memCache) Size(ctx context.Context, key string) (int64, error) {
 	log.Printf("[MEM] Size: key=%s", key)
 	e, err := m.get(ctx, key)
@@ -511,7 +622,13 @@ func (m *memCache) Size(ctx context.Context, key string) (int64, error) {
 	log.Printf("[MEM] Size: size=%d", len(e.buffer))
 	return int64(len(e.buffer)), nil
 }
+```
 
+---
+
+## memCache.Delete (line 406)
+
+```go
 func (m *memCache) Delete(ctx context.Context, key string) error {
 	log.Printf("[MEM] Delete: key=%s", key)
 	m.Lock()
@@ -526,11 +643,13 @@ func (m *memCache) Delete(ctx context.Context, key string) error {
 	log.Printf("[MEM] Delete: not found")
 	return nil
 }
+```
 
-type multiCache struct {
-	caches []cache
-}
+---
 
+## multiCache.Get (line 422)
+
+```go
 func (m *multiCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	log.Printf("[MULTI] Get: key=%s", key)
 	for i, c := range m.caches {
@@ -553,7 +672,13 @@ func (m *multiCache) Get(ctx context.Context, key string) (*soci.TOC, error) {
 	log.Printf("[MULTI] Get: miss in all caches")
 	return nil, io.EOF
 }
+```
 
+---
+
+## multiCache.Put (line 445)
+
+```go
 func (m *multiCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	log.Printf("[MULTI] Put: key=%s", key)
 	errs := []error{}
@@ -567,7 +692,13 @@ func (m *multiCache) Put(ctx context.Context, key string, toc *soci.TOC) error {
 	}
 	return Join(errs...)
 }
+```
 
+---
+
+## multiCache.Writer (line 457)
+
+```go
 func (m *multiCache) Writer(ctx context.Context, key string) (io.WriteCloser, error) {
 	log.Printf("[MULTI] Writer: key=%s", key)
 	writers := []io.WriteCloser{}
@@ -583,7 +714,13 @@ func (m *multiCache) Writer(ctx context.Context, key string) (io.WriteCloser, er
 	log.Printf("[MULTI] Writer: returning MultiWriter with %d writers", len(writers))
 	return MultiWriter(writers...), nil
 }
+```
 
+---
+
+## multiCache.Reader (line 470)
+
+```go
 func (m *multiCache) Reader(ctx context.Context, key string) (io.ReadCloser, error) {
 	log.Printf("[MULTI] Reader: key=%s", key)
 	for i, c := range m.caches {
@@ -599,7 +736,13 @@ func (m *multiCache) Reader(ctx context.Context, key string) (io.ReadCloser, err
 	log.Printf("[MULTI] Reader: miss in all caches")
 	return nil, io.EOF
 }
+```
 
+---
+
+## multiCache.RangeReader (line 484)
+
+```go
 func (m *multiCache) RangeReader(ctx context.Context, key string, offset, length int64) (io.ReadCloser, error) {
 	log.Printf("[MULTI] RangeReader: key=%s offset=%d length=%d", key, offset, length)
 	for i, c := range m.caches {
@@ -622,7 +765,13 @@ func (m *multiCache) RangeReader(ctx context.Context, key string, offset, length
 	log.Printf("[MULTI] RangeReader: miss in all caches")
 	return nil, io.EOF
 }
+```
 
+---
+
+## multiCache.Size (line 506)
+
+```go
 func (m *multiCache) Size(ctx context.Context, key string) (int64, error) {
 	log.Printf("[MULTI] Size: key=%s", key)
 	for i, c := range m.caches {
@@ -638,7 +787,13 @@ func (m *multiCache) Size(ctx context.Context, key string) (int64, error) {
 	log.Printf("[MULTI] Size: miss in all caches")
 	return -1, io.EOF
 }
+```
 
+---
+
+## multiCache.Delete (line 519)
+
+```go
 func (m *multiCache) Delete(ctx context.Context, key string) error {
 	log.Printf("[MULTI] Delete: key=%s", key)
 	errs := []error{}
@@ -651,11 +806,13 @@ func (m *multiCache) Delete(ctx context.Context, key string) error {
 	}
 	return Join(errs...)
 }
+```
 
-type multiWriter struct {
-	writers []io.WriteCloser
-}
+---
 
+## multiWriter.Write (line 533)
+
+```go
 func (t *multiWriter) Write(p []byte) (n int, err error) {
 	log.Printf("[MULTI] multiWriter.Write: len=%d", len(p))
 	for i, w := range t.writers {
@@ -673,7 +830,13 @@ func (t *multiWriter) Write(p []byte) (n int, err error) {
 	}
 	return len(p), nil
 }
+```
 
+---
+
+## multiWriter.Complete (line 547)
+
+```go
 func (t *multiWriter) Complete() {
 	log.Printf("[MULTI] multiWriter.Complete: numWriters=%d", len(t.writers))
 	for i, w := range t.writers {
@@ -683,7 +846,13 @@ func (t *multiWriter) Complete() {
 		}
 	}
 }
+```
 
+---
+
+## multiWriter.Close (line 555)
+
+```go
 func (t *multiWriter) Close() error {
 	log.Printf("[MULTI] multiWriter.Close: numWriters=%d", len(t.writers))
 	errs := []error{}
@@ -696,60 +865,13 @@ func (t *multiWriter) Close() error {
 	}
 	return Join(errs...)
 }
+```
 
-func MultiWriter(writers ...io.WriteCloser) io.WriteCloser {
-	allWriters := make([]io.WriteCloser, 0, len(writers))
-	for _, w := range writers {
-		if mw, ok := w.(*multiWriter); ok {
-			allWriters = append(allWriters, mw.writers...)
-		} else {
-			allWriters = append(allWriters, w)
-		}
-	}
-	return &multiWriter{allWriters}
-}
+---
 
-// TODO: 1.20 errors.Join
-func Join(errs ...error) error {
-	n := 0
-	for _, err := range errs {
-		if err != nil {
-			n++
-		}
-	}
-	if n == 0 {
-		return nil
-	}
-	e := &joinError{
-		errs: make([]error, 0, n),
-	}
-	for _, err := range errs {
-		if err != nil {
-			e.errs = append(e.errs, err)
-		}
-	}
-	return e
-}
+## buildGcsCache (line 619)
 
-type joinError struct {
-	errs []error
-}
-
-func (e *joinError) Error() string {
-	var b []byte
-	for i, err := range e.errs {
-		if i > 0 {
-			b = append(b, '\n')
-		}
-		b = append(b, err.Error()...)
-	}
-	return string(b)
-}
-
-func (e *joinError) Unwrap() []error {
-	return e.errs
-}
-
+```go
 func buildGcsCache(bucket string) (cache, error) {
 	log.Printf("[BUILD] buildGcsCache: bucket=%s", bucket)
 	client, err := storage.NewClient(context.Background())
@@ -761,7 +883,13 @@ func buildGcsCache(bucket string) (cache, error) {
 	log.Printf("[BUILD] buildGcsCache: created bucket handle")
 	return &gcsCache{client, bkt}, nil
 }
+```
 
+---
+
+## buildTocCache (line 629)
+
+```go
 func buildTocCache() cache {
 	log.Printf("[BUILD] buildTocCache: START")
 	mc := &memCache{
@@ -777,7 +905,13 @@ func buildTocCache() cache {
 	log.Printf("[BUILD] buildTocCache: returning multiCache with %d caches", len(caches))
 	return &multiCache{caches}
 }
+```
 
+---
+
+## buildIndexCache (line 643)
+
+```go
 func buildIndexCache() cache {
 	log.Printf("[BUILD] buildIndexCache: START")
 	caches := []cache{}
@@ -786,3 +920,4 @@ func buildIndexCache() cache {
 	log.Printf("[BUILD] buildIndexCache: returning multiCache with %d caches", len(caches))
 	return &multiCache{caches}
 }
+```
