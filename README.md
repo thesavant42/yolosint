@@ -18,16 +18,8 @@ docker compose up --build
 
 Service runs at `http://localhost:8042`
 
----
 
-### When to use `--build`
-
-| Scenario | Command |
-|----------|---------|
-| First run | `docker compose up --build` |
-| After pulling changes | `docker compose up --build` |
-| Restarting (no code changes) | `docker compose up` |
-| Stop | `docker compose down` |
+**Now with verbose logging!**
 
 ---
 

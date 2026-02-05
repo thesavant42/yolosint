@@ -77,6 +77,9 @@ details > summary::-webkit-details-marker {
 </head>
 <h1><a class="top" href="/"><img class="crane" src="/docdork-32.png"/> <span class="link"></span></a></h1>
 <p>
+yolosint - by <a href="/yolosint.user.js">@thesavant42</a>
+</p>
+<p>
 Enter a <strong>public</strong> image, e.g. <tt>"ubuntu:latest"</tt>:
 </p>
 <form action="/" method="GET" autocomplete="off" spellcheck="false">
