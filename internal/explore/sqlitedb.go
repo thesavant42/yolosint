@@ -2,7 +2,6 @@ package explore
 
 import (
 	"database/sql"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -19,10 +18,10 @@ type TocDB struct {
 }
 
 // db, err := sql.Open("sqlite", "file:experiment.db") works
-func OpenTocDB(cacheDir string) (*TocDB, error) {
-	dbPath := filepath.Join(cacheDir, "log.db")
+func OpenTocDB() (*TocDB, error) {
+	dbPath := "/cache/log.db"
 
-	db, err := sql.Open("sqlite", "file:"+dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, err
 	}
