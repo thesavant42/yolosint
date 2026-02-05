@@ -2,6 +2,7 @@ package explore
 
 import (
 	"database/sql"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -18,8 +19,10 @@ type TocDB struct {
 }
 
 // db, err := sql.Open("sqlite", "file:experiment.db") works
-func OpenTocDB() (*TocDB, error) {
-	db, err := sql.Open("sqlite", "file:/cache/log.db")
+func OpenTocDB(cacheDir string) (*TocDB, error) {
+	dbPath := filepath.Join(cacheDir, "log.db")
+
+	db, err := sql.Open("sqlite", "file:"+dbPath)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +52,7 @@ func OpenTocDB() (*TocDB, error) {
     CREATE INDEX IF NOT EXISTS idx_files_name ON files(name);
     CREATE INDEX IF NOT EXISTS idx_layers_digest ON layers(digest);
     `
+
 	if _, err := db.Exec(schema); err != nil {
 		db.Close()
 		return nil, err
