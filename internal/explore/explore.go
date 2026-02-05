@@ -110,11 +110,7 @@ func New(opts ...Option) http.Handler {
 	if err := os.MkdirAll("/cache", 0755); err != nil {
 		log.Printf("failed to create /cache: %v", err)
 	}
-	db, err := OpenTocDB()
-	if err != nil {
-		log.Fatalf("failed to open /cache/log.db: %v", err)
-	}
-	h.tocDB = db
+	h.tocDB = NewTocDB("/cache/log.db")
 
 	for _, opt := range opts {
 		opt(&h)
