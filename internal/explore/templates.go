@@ -77,7 +77,7 @@ details > summary::-webkit-details-marker {
 </head>
 <h1><a class="top" href="/"><img class="crane" src="/docdork-32.png"/> <span class="link"></span></a></h1>
 <p>
-yolosint - by <a href="/yolosint.user.js">@thesavant42</a>
+<a href="/yolosint.user.js">yolosint</a> - by <a href="https://github.com/thesavant42/yolosint">@thesavant42</a>
 </p>
 <p>
 Enter a <strong>public</strong> image, e.g. <tt>"ubuntu:latest"</tt>:

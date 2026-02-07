@@ -4,4 +4,4 @@ dist/
 cache/
 oci
 *.exe
-
+*.code-workspace
