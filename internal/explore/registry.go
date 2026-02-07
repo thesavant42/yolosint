@@ -11,13 +11,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/thesavant42/yolosint/internal/verify"
 	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/authn"
 	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/logs"
 	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
 	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/google"
 	"github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1/remote"
-	"github.com/thesavant42/yolosint/internal/verify"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 )
@@ -396,55 +396,6 @@ func (h *handler) getDigest(w http.ResponseWriter, r *http.Request) (name.Digest
 		}
 		return dig, root + ref, nil
 	}
-	
-	// downloadLayer handles authenticated layer downloads by proxying through the handler.
-	// This allows downloading from private registries that require authentication.
-	// URL format: /download/registry/repo@sha256:digest
-	func (h *handler) downloadLayer(w http.ResponseWriter, r *http.Request) error {
-		// Strip /download/ prefix
-		path := strings.TrimPrefix(r.URL.Path, "/download/")
-	
-		// Parse repo@digest format
-		blobRef, err := name.NewDigest(path)
-		if err != nil {
-			return fmt.Errorf("invalid reference %q: %w", path, err)
-		}
-	
-		// Get authenticated remote options
-		opts := h.remoteOptions(w, r, blobRef.Context().Name())
-	
-		// Fetch layer with authentication
-		l, err := remote.Layer(blobRef, opts...)
-		if err != nil {
-			return fmt.Errorf("fetching layer: %w", err)
-		}
-	
-		// Get layer size for Content-Length
-		size, err := l.Size()
-		if err != nil {
-			log.Printf("could not get layer size: %v", err)
-		}
-	
-		// Get compressed content
-		rc, err := l.Compressed()
-		if err != nil {
-			return fmt.Errorf("getting compressed layer: %w", err)
-		}
-		defer rc.Close()
-	
-		// Set download headers
-		digest := blobRef.DigestStr()
-		filename := fmt.Sprintf("%s.tar.gz", strings.ReplaceAll(digest, ":", "-"))
-		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename=%q`, filename))
-		w.Header().Set("Content-Type", "application/gzip")
-		if size > 0 {
-			w.Header().Set("Content-Length", strconv.FormatInt(size, 10))
-		}
-	
-		// Stream layer to client
-		_, err = io.Copy(w, rc)
-		return err
-	}
 	if root == "/cache/" {
 		idx, ref, ok := strings.Cut(ref, "/")
 		if !ok {
@@ -463,4 +414,53 @@ func (h *handler) getDigest(w http.ResponseWriter, r *http.Request) (name.Digest
 	}
 
 	return dig, root + ref, nil
+}
+
+// downloadLayer handles authenticated layer downloads by proxying through the handler.
+// This allows downloading from private registries that require authentication.
+// URL format: /download/registry/repo@sha256:digest
+func (h *handler) downloadLayer(w http.ResponseWriter, r *http.Request) error {
+	// Strip /download/ prefix
+	path := strings.TrimPrefix(r.URL.Path, "/download/")
+
+	// Parse repo@digest format
+	blobRef, err := name.NewDigest(path)
+	if err != nil {
+		return fmt.Errorf("invalid reference %q: %w", path, err)
+	}
+
+	// Get authenticated remote options
+	opts := h.remoteOptions(w, r, blobRef.Context().Name())
+
+	// Fetch layer with authentication
+	l, err := remote.Layer(blobRef, opts...)
+	if err != nil {
+		return fmt.Errorf("fetching layer: %w", err)
+	}
+
+	// Get layer size for Content-Length
+	size, err := l.Size()
+	if err != nil {
+		log.Printf("could not get layer size: %v", err)
+	}
+
+	// Get compressed content
+	rc, err := l.Compressed()
+	if err != nil {
+		return fmt.Errorf("getting compressed layer: %w", err)
+	}
+	defer rc.Close()
+
+	// Set download headers
+	digest := blobRef.DigestStr()
+	filename := fmt.Sprintf("%s.tar.gz", strings.ReplaceAll(digest, ":", "-"))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename=%q`, filename))
+	w.Header().Set("Content-Type", "application/gzip")
+	if size > 0 {
+		w.Header().Set("Content-Length", strconv.FormatInt(size, 10))
+	}
+
+	// Stream layer to client
+	_, err = io.Copy(w, rc)
+	return err
 }
