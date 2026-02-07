@@ -362,10 +362,14 @@ func renderJSON(w *jsonOutputter, b []byte) error {
 func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	image := w.u.Query().Get("image")
 
-	// Build filename base from image reference (replace special chars with -)
-	filenameBase := strings.ReplaceAll(image, "/", "-")
+	// Build filename base from image reference (strip digest, replace special chars with -)
+	// Remove digest portion if present (anything after @)
+	filenameBase := image
+	if idx := strings.Index(filenameBase, "@"); idx != -1 {
+		filenameBase = filenameBase[:idx]
+	}
+	filenameBase = strings.ReplaceAll(filenameBase, "/", "-")
 	filenameBase = strings.ReplaceAll(filenameBase, ":", "-")
-	filenameBase = strings.ReplaceAll(filenameBase, "@", "-")
 
 	// Config row (aligned with digest table above: label, size, sha256)
 	w.Print(`<table><tr><td><strong>config</strong></td><td>`)
