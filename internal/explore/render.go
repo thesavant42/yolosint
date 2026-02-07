@@ -362,6 +362,11 @@ func renderJSON(w *jsonOutputter, b []byte) error {
 func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	image := w.u.Query().Get("image")
 
+	// Build filename base from image reference (replace special chars with -)
+	filenameBase := strings.ReplaceAll(image, "/", "-")
+	filenameBase = strings.ReplaceAll(filenameBase, ":", "-")
+	filenameBase = strings.ReplaceAll(filenameBase, "@", "-")
+
 	// Config row (aligned with digest table above: label, size, sha256)
 	w.Print(`<table><tr><td><strong>config</strong></td><td>`)
 	if cfg, ok := m["config"].(map[string]interface{}); ok {
@@ -388,7 +393,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	w.Print(`</td></tr></table>`)
 
 	// Layers section with labels
-	w.Print(`<table><tr><td colspan="2"><strong>LIST VIEW:</strong></td><td colspan="2"><strong>LAYERS VIEW</strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td></tr>`)
+	w.Print(`<table><tr><td colspan="2"><strong>LIST VIEW:</strong></td><td colspan="2"><strong>LAYERS VIEW</strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td></tr>`)
 	if layers, ok := m["layers"].([]interface{}); ok {
 		for i, l := range layers {
 			if layer, ok := l.(map[string]interface{}); ok {
@@ -409,12 +414,16 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				if strings.Contains(handler, "?") {
 					qs = "&"
 				}
-				// Two index columns: one before size, one before digest
-				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td></tr>`,
+				// Construct download filename: namespace-repo-tag-idx.tar.gzip
+				downloadFilename := fmt.Sprintf("%s-%d.tar.gzip", filenameBase, i+1)
+
+				// Two index columns: one before size, one before digest, then download link
+				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="/blob/%s@%s?mt=%s&size=%d" download="%s" title="Download %s">[x]</a></td></tr>`,
 					i+1,
 					w.repo, digest, url.QueryEscape(mt), size, humanize.IBytes(uint64(size)),
 					i+1,
-					handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
+					handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest),
+					w.repo, digest, url.QueryEscape(mt), size, html.EscapeString(downloadFilename), html.EscapeString(downloadFilename))
 			}
 		}
 	}

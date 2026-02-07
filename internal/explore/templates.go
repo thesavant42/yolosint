@@ -80,7 +80,6 @@ details > summary::-webkit-details-marker {
 <a href="/yolosint.user.js">yolosint</a> - by <a href="https://github.com/thesavant42/yolosint">@thesavant42</a>
 </p>
 <p>
-Search for a <strong>public</strong> container:
 </p>
 <form id="searchForm" action="/" method="GET" autocomplete="off" spellcheck="false">
 <input id="searchInput" size="40" type="text" name="image" value="ubuntu:latest"/> <select id="searchType" onchange="updateSearch()">

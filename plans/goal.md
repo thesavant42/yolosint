@@ -1,101 +1,46 @@
-# Goal  Simpify Search Boxes from 3 to 1
-
-Problem:
-
-[Search in explorders template.go](/internal/explore/templates.go) is a confusing mess on the app mainpage as seen in this screenshot:
+# Save Single Layer from Layer view
 
 
+## Current Status
 
-![threes search boxes](/docs/screenshots/main.png)
+![current view](/plans/current.png)
 
+### User Journey
+- When I visit a `?image=namespace/repo:tag` root link, such as http://192.168.1.37:8042/?image=smoshysmosh%2Fcomposer%3Alatest :
+    - I am able to view a [list of the fies](http://192.168.1.37:8042/size/smoshysmosh/composer@sha256:0b342bf7e74f5fbef621a6d413a2a56088d405057e0e165e383904fe37fe28a2?mt=application%2Fvnd.docker.image.rootfs.diff.tar.gzip&size=26470178),
+    - I am able to browse the [filesystem by clicking this link](http://192.168.1.37:8042/fs/smoshysmosh/composer@sha256:0b342bf7e74f5fbef621a6d413a2a56088d405057e0e165e383904fe37fe28a2/?mt=application%2Fvnd.docker.image.rootfs.diff.tar.gzip&size=26470178)
 
-There are three search input boxes, but only one can be used at any give time. 
+### Problem Statement 
 
-## Proposed Solution:
+- There's no mechanism to download the layer `.tar.gzip` file as a whole layer
 
-### Selection Dropdown or Radio
+## Proposed Solution
 
-Create a Single Text Input, 3 routes:
-    1. Image
-        Requests to `/?image=namespace/repo:tag`
-    2. Repo
-        Requests to `/?repo=repo`
-    3. Docker Hub
-        POSTs to `https://hub.docker.com/search?q=`
-    ~~4. (TODO: Cache History Search)~~
-        ~~1. Search the sqlite database for previously observed file names~~
+Add a text link to download the layer from the registry, as indicated in this screenshot mockup: The text label `[x]` is after each layer's `sha256:digest`. 
 
-#### Considerations:
+![mockup](/plans/mockup.png)
 
-- Must still allow DIRECT posts and gets to continue to work 
-- example text will need to be refactored to provider hovertext help or to render it when the option is selected
+Instead of the default sha256 layer digest as the file name I'd like to save it as:
 
-- Default to optionn 1, the Image route (currently the top most text input in the screenshot)
-    - `<input size="100" type="text" name="image" value="ubuntu:latest">`
-
+`namespace-repo-tag-idx.tar.gzip`. where `idx` is the layer number being saved.
 
 ---
 
+You hit Docker Hub’s registry API directly: first GET a Bearer token for `repository:<namespace>/<repo>:pull`, then use that token to fetch the manifest, then download the specific layer blob by its digest. The blob URL is always `https://registry-1.docker.io/v2/<namespace>/<repo>/blobs/<digest>` and returns the raw tar.gz filesystem layer. 
+---
 
-Based on my analysis, here's the proposed design for the unified search form:
 
-## Current State Analysis
 
-The [`landingPage`](internal/explore/templates.go:22) constant contains 3 separate `<form>` elements:
 
-| Form | Action | Method | Input Name | Default Value |
-|------|--------|--------|------------|---------------|
-| Image | `/` | GET | `image` | `ubuntu:latest` |
-| Repo | `/` | GET | `repo` | `ubuntu` |
-| Docker Hub | `https://hub.docker.com/search` | GET | `q` | (empty) |
+Based on my analysis of the codebase, I now understand the requirements and the current architecture. Let me create a plan for implementing the layer download feature.
 
-## Proposed Design
+## Summary of Analysis
 
-### HTML Structure
+**Current State:**
+- The layer list is rendered in [`renderManifestTables()`](internal/explore/render.go:362) in `render.go`
+- Each layer row shows: index, size link, index again, and the digest link
+- There's an existing `SaveURL` pattern used for file downloads in [`HeaderData`](internal/explore/templates.go:313)
 
-```
-+------------------+  +----------------------------------+  +--------+
-| [Dropdown v]     |  | [Search Input Text Field]        |  | Search |
-+------------------+  +----------------------------------+  +--------+
-     ^                      ^
-     |                      |
-  Options:               Dynamic placeholder
-  - Image (default)      based on selection
-  - Repository
-  - Docker Hub
-```
-
-### Key Design Decisions
-
-1. **Single Form with JavaScript Handler** - The form will use JavaScript to:
-   - Dynamically set the form action URL
-   - Dynamically set the input field's `name` attribute
-   - Update placeholder text when dropdown changes
-
-2. **Dropdown Options**:
-   - `image` - "Image" (default) - placeholder: `ubuntu:latest`
-   - `repo` - "Repository" - placeholder: `ubuntu`
-   - `dockerhub` - "Docker Hub" - placeholder: `Search Docker Hub...`
-
-3. **Form Submission Logic**:
-   - For `image`: Submit to `/?image={value}`
-   - For `repo`: Submit to `/?repo={value}`
-   - For `dockerhub`: Submit to `https://hub.docker.com/search?q={value}`
-
-4. **Backward Compatibility**: Direct URL access to `/?image=...` and `/?repo=...` will continue to work since the server-side handlers remain unchanged.
-
-### Implementation Flow
-
-```mermaid
-flowchart TD
-    A[User selects search type from dropdown] --> B[JavaScript updates placeholder text]
-    B --> C[User enters search query]
-    C --> D[User clicks Search or presses Enter]
-    D --> E{Which option selected?}
-    E -->|Image| F[Set name=image, action=/]
-    E -->|Repository| G[Set name=repo, action=/]
-    E -->|Docker Hub| H[Set name=q, action=hub.docker.com/search]
-    F --> I[Submit form via GET]
-    G --> I
-    H --> I
-```
+**Goal:**
+- Add `[x]` download links after each layer's digest
+- Download filename format: `namespace-repo-tag-idx.tar.gzip`
