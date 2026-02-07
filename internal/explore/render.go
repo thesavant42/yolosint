@@ -421,18 +421,8 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				// Construct download filename: namespace-repo-tag-idx.tar.gzip
 				downloadFilename := fmt.Sprintf("%s-%d.tar.gzip", filenameBase, i+1)
 
-				// Build direct registry blob URL: https://<registry>/v2/<repo>/blobs/<digest>
-				registry := "registry-1.docker.io"
-				repoPath := w.repo
-				if strings.Contains(w.repo, "/") {
-					parts := strings.SplitN(w.repo, "/", 2)
-					if strings.Contains(parts[0], ".") {
-						// First part contains a dot, so it's a registry domain
-						registry = parts[0]
-						repoPath = parts[1]
-					}
-				}
-				downloadURL := fmt.Sprintf("https://%s/v2/%s/blobs/%s", registry, repoPath, digest)
+				// Use proxied download URL for authenticated layer downloads
+				downloadURL := fmt.Sprintf("/download/%s@%s", w.repo, digest)
 
 				// Two index columns: one before size, one before digest, then download link
 				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s">[x]</a></td></tr>`,

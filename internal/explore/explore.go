@@ -138,6 +138,9 @@ func New(opts ...Option) http.Handler {
 
 	mux.HandleFunc("/zurl/", h.errHandler(h.renderZurl))
 
+	// Authenticated layer download endpoint
+	mux.HandleFunc("/download/", h.errHandler(h.downloadLayer))
+
 	h.mux = gzhttp.GzipHandler(mux)
 
 	return &h
@@ -153,7 +156,7 @@ func (h *handler) logTOC(key string, toc *soci.TOC) {
 }
 
 func splitFsURL(p string) (string, string, error) {
-	for _, prefix := range []string{"/fs/", "/layers/", "/https/", "/http/", "/blob/", "/cache/", "/size/", "/sizes/", "/zurl/"} {
+	for _, prefix := range []string{"/fs/", "/layers/", "/https/", "/http/", "/blob/", "/cache/", "/size/", "/sizes/", "/zurl/", "/download/"} {
 		if strings.HasPrefix(p, prefix) {
 			return strings.TrimPrefix(p, prefix), prefix, nil
 		}
