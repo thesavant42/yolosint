@@ -80,28 +80,41 @@ details > summary::-webkit-details-marker {
 <a href="/yolosint.user.js">yolosint</a> - by <a href="https://github.com/thesavant42/yolosint">@thesavant42</a>
 </p>
 <p>
-Enter a <strong>public</strong> image, e.g. <tt>"ubuntu:latest"</tt>:
+Search for a <strong>public</strong> container:
 </p>
-<form action="/" method="GET" autocomplete="off" spellcheck="false">
-<input size="100" type="text" name="image" value="ubuntu:latest"/>
-<input type="submit" />
+<form id="searchForm" action="/" method="GET" autocomplete="off" spellcheck="false">
+<input id="searchInput" size="40" type="text" name="image" value="ubuntu:latest"/> <select id="searchType" onchange="updateSearch()">
+  <option value="image" selected>Image</option>
+  <option value="repo">Repository</option>
+  <option value="dockerhub">Docker Hub</option>
+</select> <input type="submit" />
 </form>
-<p>
-<p>
-Enter a <strong>public</strong> repository, e.g. <tt>"ubuntu"</tt>:
-</p>
-<form action="/" method="GET" autocomplete="off" spellcheck="false">
-<input size="100" type="text" name="repo" value="ubuntu"/>
-<input type="submit" />
-</form>
-<p>
-Search <a href="https://hub.docker.com">Docker Hub</a>
-<p>	
-</p>
-<form action="https://hub.docker.com/search" method="GET" autocomplete="off" spellcheck="false">
-<input size="100" type="text" name="q" placeholder="Search Docker Hub..."/>
-<input type="submit" value="Search"/>
-</form>
+
+<script>
+function updateSearch() {
+  var sel = document.getElementById('searchType');
+  var inp = document.getElementById('searchInput');
+  var frm = document.getElementById('searchForm');
+  var v = sel.value;
+  
+  if (v === 'image') {
+    inp.name = 'image';
+    inp.placeholder = 'ubuntu:latest';
+    inp.value = 'ubuntu:latest';
+    frm.action = '/';
+  } else if (v === 'repo') {
+    inp.name = 'repo';
+    inp.placeholder = 'ubuntu';
+    inp.value = 'ubuntu';
+    frm.action = '/';
+  } else {
+    inp.name = 'q';
+    inp.placeholder = 'Search Docker Hub...';
+    inp.value = '';
+    frm.action = 'https://hub.docker.com/search';
+  }
+}
+</script>
 <p>
 <details>
 <summary>Interesting examples</summary>
