@@ -422,7 +422,8 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				downloadFilename := fmt.Sprintf("%s-%d.tar.gzip", filenameBase, i+1)
 
 				// Use proxied download URL for authenticated layer downloads
-				downloadURL := fmt.Sprintf("/download/%s@%s", w.repo, digest)
+				// Pass filename as query param so server can set correct Content-Disposition
+				downloadURL := fmt.Sprintf("/download/%s@%s?filename=%s", w.repo, digest, url.QueryEscape(downloadFilename))
 
 				// Two index columns: one before size, one before digest, then download link
 				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s">[x]</a></td></tr>`,

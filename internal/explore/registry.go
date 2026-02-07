@@ -452,8 +452,12 @@ func (h *handler) downloadLayer(w http.ResponseWriter, r *http.Request) error {
 	defer rc.Close()
 
 	// Set download headers
-	digest := blobRef.DigestStr()
-	filename := fmt.Sprintf("%s.tar.gz", strings.ReplaceAll(digest, ":", "-"))
+	// Use filename from query param if provided, otherwise fallback to digest-based name
+	filename := r.URL.Query().Get("filename")
+	if filename == "" {
+		digest := blobRef.DigestStr()
+		filename = fmt.Sprintf("%s.tar.gz", strings.ReplaceAll(digest, ":", "-"))
+	}
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename=%q`, filename))
 	w.Header().Set("Content-Type", "application/gzip")
 	if size > 0 {
