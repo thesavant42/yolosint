@@ -1,96 +1,43 @@
-# Save Single Layer from Layer view
+# Refactor Template
+
+## Summary of Task
+
+Refactor: [rendergo](/internal/explore/render.go)
+
+### Problem Statement
+
+Current view is cluttered and needs alignment of the elements. The follow screencapture demonstrates the current state of the view when browsing `http://192.168.1.37:8042/?image=smoshysmosh/composer@sha256:4de9e962f0780c5bf92917340931f28f20556326ec6b102eaa24984622141858&mt=application%2Fvnd.docker.distribution.manifest.v2%2Bjson&size=3458`
+
+![current](/plans/current.png)
 
 
-## Current Status
+---
 
-~~![current view](/plans/current.png)~~
-**Has links, but they don't use the authentication flow**
+## Mockup
 
-1. Authenticate to the registry, 
-2. use the JWT from the registry to make an authenticated request to save the layer
-    - The registry serves the file, we save it.
-    - The same flow exists for viewing layer images, saving layer files.
-
-
-### User Journey
-- When I visit a `?image=namespace/repo:tag` root link, such as http://192.168.1.37:8042/?image=smoshysmosh%2Fcomposer%3Alatest :
-    - I am able to view a [list of the fies](http://192.168.1.37:8042/size/smoshysmosh/composer@sha256:0b342bf7e74f5fbef621a6d413a2a56088d405057e0e165e383904fe37fe28a2?mt=application%2Fvnd.docker.image.rootfs.diff.tar.gzip&size=26470178),
-    - I am able to browse the [filesystem by clicking this link](http://192.168.1.37:8042/fs/smoshysmosh/composer@sha256:0b342bf7e74f5fbef621a6d413a2a56088d405057e0e165e383904fe37fe28a2/?mt=application%2Fvnd.docker.image.rootfs.diff.tar.gzip&size=26470178)
-
-### Problem Statement 
-
-- There's no mechanism to download the layer `.tar.gzip` file as a whole layer
-
-## Proposed Solution
-
-Add a text link to download the layer from the registry, as indicated in this screenshot mockup: The text label `[x]` is after each layer's `sha256:digest`. 
+This is a mockup of the same screenshot, but with the elements restructured the way that I would like them.
 
 ![mockup](/plans/mockup.png)
 
-Instead of the default sha256 layer digest as the file name I'd like to save it as:
+### List of changes
 
-`namespace-repo-tag-idx.tar.gzip`. where `idx` is the layer number being saved.
+ 1. **Truncated** the `sha256` digest **beneath the logo** to *12* characters
+ 2. Truncate Manifest Type (there aren't that many types, easy to abbreviate)
+ 3. **Moved** `combined layers view` and `referrers` to the same line, below the topmost digest.
+ 4. **Removed** the "`Docker pull`" box from this view (not the tag, this command will fail)
+ 5. `CONFIG` label is now capitalized and placed in alignment with the "`LIST VIEW:`" column label. 
+ 6. `CONFIG` size is aligned with file size
+ 7. `sha256` digest for config is aligned with other `sha256` digests
+ 8. **Removed** the redundant Layer IDX column. Now there are *4* columns: The `idx`, the `file size`, the `sha256` digest, and the download `buttons`.
+ 9. **Removed** redundant `digest` text label and sha256:digest, it's the same one we're truncating below the logo, so no need to have it twice.
 
----
+## Task 
 
-You hit Docker Hub’s registry API directly: first GET a Bearer token for `repository:<namespace>/<repo>:pull`, then use that token to fetch the manifest, then download the specific layer blob by its digest. The blob URL is always `https://registry-1.docker.io/v2/<namespace>/<repo>/blobs/<digest>` and returns the raw tar.gz filesystem layer. 
----
-- The layer list is rendered in [`renderManifestTables()`](internal/explore/render.go:362) in `render.go`
-- Each layer row shows: index, size link, index again, and the digest link
-- There's an existing `SaveURL` pattern used for file downloads in [`HeaderData`](internal/explore/templates.go:313)
+1 . Make a plan with the required lines of code to change.
+- Include sufficient detail for handoff to a coding agent
+    - line numnbers where applicable
 
-**Goal:**
-- Add `[x]` download links after each layer's digest
-- Download filename format: `namespace-repo-tag-idx.tar.gzip`
+### Validation Criteria
+- Must match the mockup screenshsot 1:1
+- validate against this doc, [goal.md](/plans/goal.md)
 
-### Example code
-
-Here's the sequence using a real image, but done in curl to demonstrate. 
-
-```bash
-# Get token
-TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:smoshysmosh/composer:pull" | jq -r .token)
-# Use token
-curl -L -H "Authorization: Bearer $TOKEN" \
-  "https://registry-1.docker.io/v2/smoshysmosh/composer/blobs/sha256:0b342bf7e74f5fbef621a6d413a2a56088d405057e0e165e383904fe37fe28a2" \
-  -o namespace-repo-tag-layer.tar.gz
-```
-
-
-I see the problem clearly now. The current code at [`renderManifestTables()`](internal/explore/render.go:362) creates a direct `<a href>` link to the registry URL:
-
-```go
-downloadURL := fmt.Sprintf("https://%s/v2/%s/blobs/%s", registry, repoPath, digest)
-```
-
-This bypasses authentication entirely. The browser can't add Bearer tokens to a simple link click. The solution needs a server-side proxy endpoint that:
-1. Receives the download request
-2. Authenticates to the registry (gets Bearer token)
-3. Fetches the blob
-4. Streams it to the user with `Content-Disposition` header
-
----
-
-
-## Analysis Summary
-
-**The Problem:** The current code at [`renderManifestTables()`](internal/explore/render.go:362) creates direct `<a href>` links to registry URLs like `https://registry-1.docker.io/v2/<repo>/blobs/<digest>`. This bypasses authentication entirely - browsers cannot inject Bearer tokens into simple link clicks.
-
-**The Solution:** Create a server-side proxy endpoint that:
-1. Receives the download request from the user
-2. Authenticates to the registry (gets Bearer token)
-3. Fetches the blob with proper auth headers
-4. Streams it back to the user with `Content-Disposition` header
-
-**Existing Patterns:**
-- [`SaveURL`](internal/explore/templates.go:313) pattern already exists for file downloads
-- Handler has auth infrastructure: [`tokens map[string]token`](internal/explore/explore.go:66), keychain support
-- Routes like [`/fs/`](internal/explore/explore.go:123), [`/size/`](internal/explore/explore.go:124) already fetch authenticated blobs
-- 
-- 
-Now I see how it works. [`transportFromCookie()`](internal/explore/cookies.go:18) already:
-- Pings registry (line 37)
-- Gets/caches Bearer token via `transport.NewBearer()` (line 55)
-- Token is stored in `tok.TokenResponse.Token` (cached at line 78)
-
-The simplification would be to **extract** the token-getting logic into a separate `getToken()` function that `transportFromCookie()` can call, rather than duplicating code.
