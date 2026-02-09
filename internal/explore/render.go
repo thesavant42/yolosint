@@ -397,7 +397,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	w.Print(`</td></tr></table>`)
 
 	// Layers section with labels
-	w.Print(`<table><tr><td colspan="2"><strong>LIST VIEW: </strong></td><td colspan="2"><strong>LAYERS VIEW: </strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td></tr>`)
+	w.Print(`<table><tr><td colspan="2"><strong>[LIST VIEW] </strong></td><td colspan="2"><strong>[LAYERS VIEW] </strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td></tr>`)
 	if layers, ok := m["layers"].([]interface{}); ok {
 		for i, l := range layers {
 			if layer, ok := l.(map[string]interface{}); ok {
