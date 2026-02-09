@@ -400,12 +400,20 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 		if strings.Contains(handler, "?") {
 			qs = "&"
 		}
-		w.Printf(`<a href="/%s%s@%s%smt=%s&size=%d" title="Config: %s"><img src="/eos-icons--init-container-outlined.png" alt="config" style="height:16px;vertical-align:middle"/></a> config`,
+		w.Printf(`<a href="/%s%s@%s%smt=%s&size=%d" title="Config: %s"><img src="/eos-icons--init-container-outlined.png" alt="config" style="height:16px;vertical-align:middle"/> config</a>`,
 			handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 	}
 
 	// Combined layers link with icon (same row as config)
-	w.Print(` <a href="/layers/` + image + `/"><img src="/f7--layers-alt-fill.png" alt="layers" style="height:16px;vertical-align:middle"/></a> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]`)
+	w.Print(` <a href="/layers/` + image + `/"><img src="/f7--layers-alt-fill.png" alt="layers" style="height:16px;vertical-align:middle"/></a><a href="/layers/` + image + `/">combined layers view</a>`)
+
+	// Build history link with icon
+	historyUrl := *w.u
+	historyQs := historyUrl.Query()
+	historyQs.Set("render", "history")
+	historyQs.Set("mt", mt)
+	historyUrl.RawQuery = historyQs.Encode()
+	w.Printf(` <a href="%s"><img src="/material-symbols--network-intelligence-history.png" alt="history" style="height:16px;vertical-align:middle"/> build history</a>`, historyUrl.String())
 
 	// Layers section with labels
 	w.Print(`<table>`)

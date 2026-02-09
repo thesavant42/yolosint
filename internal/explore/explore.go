@@ -230,6 +230,20 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 		return
 	}
+	if r.URL.Path == "/material-symbols--network-intelligence-history.png" {
+		w.Header().Set("Cache-Control", "max-age=3600")
+		data, _ := Assets.ReadFile("assets/material-symbols--network-intelligence-history.png")
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(data)
+		return
+	}
+	if r.URL.Path == "/mdi--docker.png" {
+		w.Header().Set("Cache-Control", "max-age=3600")
+		data, _ := Assets.ReadFile("assets/mdi--docker.png")
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(data)
+		return
+	}
 	if r.URL.Path == "/robots.txt" {
 		w.Header().Set("Cache-Control", "max-age=3600")
 		data, _ := Assets.ReadFile("assets/robots.txt")
