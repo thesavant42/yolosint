@@ -1721,6 +1721,18 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 	}
 	header.SizeLink = fmt.Sprintf("/size/%s?mt=%s&size=%d", ref.Context().Digest(hash.String()).String(), mediaType, int64(size))
 
+	// Set the current path
+	currentPath := strings.TrimPrefix(fname, "/"+prefix)
+	if currentPath == "" || currentPath == "/" {
+		currentPath = "/"
+	} else if !strings.HasPrefix(currentPath, "/") {
+		currentPath = "/" + currentPath
+	}
+	if stat.IsDir() && !strings.HasSuffix(currentPath, "/") {
+		currentPath = currentPath + "/"
+	}
+	header.Path = currentPath
+
 	// Add save link for files (not directories)
 	if !stat.IsDir() {
 		header.SaveURL = r.URL.Path + "?dl=1"
@@ -1807,6 +1819,19 @@ func renderDir(w http.ResponseWriter, fname string, prefix string, mediaType typ
 	}
 
 	header.SizeLink = fmt.Sprintf("/sizes/%s?mt=%s&size=%d", ref.Context().Digest(hash.String()).String(), mediaType, int64(size))
+
+	// Set the current path
+	currentPath := strings.TrimPrefix(fname, "/"+prefix)
+	if currentPath == "" || currentPath == "/" {
+		currentPath = "/"
+	} else if !strings.HasPrefix(currentPath, "/") {
+		currentPath = "/" + currentPath
+	}
+	// Directories should have trailing slash
+	if !strings.HasSuffix(currentPath, "/") {
+		currentPath = currentPath + "/"
+	}
+	header.Path = currentPath
 
 	return bodyTmpl.Execute(w, header)
 }

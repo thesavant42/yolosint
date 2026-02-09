@@ -259,6 +259,7 @@ td:first-child {
 	<p><strong>{{.Reference}}</strong>{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}</p>
 {{ end }}
 {{if .Subject}}<table><tr><td>OCI-Subject</td><td></td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr></table>{{end}}
+{{if .Path}}<p>path: {{.Path}}</p>{{end}}
 {{if .Filename}}<h3>{{.Filename}}</h3>{{end}}
 </div>
 `
@@ -306,6 +307,7 @@ type HeaderData struct {
 	SaveURL              string
 	Filename             string
 	AbbreviatedMediaType string
+	Path                 string
 }
 
 // AbbreviateMediaType converts a full media type string to a short label
