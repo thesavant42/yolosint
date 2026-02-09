@@ -216,6 +216,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 		return
 	}
+	if r.URL.Path == "/f7--layers-alt-fill.png" {
+		w.Header().Set("Cache-Control", "max-age=3600")
+		data, _ := Assets.ReadFile("assets/f7--layers-alt-fill.png")
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(data)
+		return
+	}
 	if r.URL.Path == "/eos-icons--init-container-outlined.png" {
 		w.Header().Set("Cache-Control", "max-age=3600")
 		data, _ := Assets.ReadFile("assets/eos-icons--init-container-outlined.png")
