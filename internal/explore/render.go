@@ -371,7 +371,17 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	filenameBase = strings.ReplaceAll(filenameBase, "/", "-")
 	filenameBase = strings.ReplaceAll(filenameBase, ":", "-")
 
-	// Config icon - inline next to manifest icon
+	// Manifest icon + Config icon on same line
+	mt := ""
+	if t, ok := m["mediaType"].(string); ok {
+		mt = t
+	}
+	abbrevMT := mt
+	if idx := strings.LastIndex(mt, "."); idx != -1 {
+		abbrevMT = mt[idx+1:]
+	}
+	w.Printf(`<img src="/ant-design--container-outlined.png" alt="manifest" style="height:16px;vertical-align:middle"/> %s `, html.EscapeString(abbrevMT))
+
 	if cfg, ok := m["config"].(map[string]interface{}); ok {
 		digest := ""
 		size := int64(0)
