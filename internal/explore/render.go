@@ -372,7 +372,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	filenameBase = strings.ReplaceAll(filenameBase, ":", "-")
 
 	// Config row (aligned with digest table above: label, size, sha256)
-	w.Print(`<table><tr><td><strong>config</strong></td><td>`)
+	w.Print(`<table><tr><td><strong>CONFIG:</strong></td><td>`)
 	if cfg, ok := m["config"].(map[string]interface{}); ok {
 		digest := ""
 		size := int64(0)
@@ -397,7 +397,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	w.Print(`</td></tr></table>`)
 
 	// Layers section with labels
-	w.Print(`<table><tr><td colspan="2"><strong>LIST VIEW:</strong></td><td colspan="2"><strong>LAYERS VIEW</strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td></tr>`)
+	w.Print(`<table><tr><td colspan="2"><strong>LIST VIEW: </strong></td><td colspan="2"><strong>LAYERS VIEW: </strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td></tr>`)
 	if layers, ok := m["layers"].([]interface{}); ok {
 		for i, l := range layers {
 			if layer, ok := l.(map[string]interface{}); ok {
@@ -425,11 +425,9 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				// Pass filename as query param so server can set correct Content-Disposition
 				downloadURL := fmt.Sprintf("/download/%s@%s?filename=%s", w.repo, digest, url.QueryEscape(downloadFilename))
 
-				// Two index columns: one before size, one before digest, then download link
-				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s">[x]</a></td></tr>`,
+				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s"> [ X ] </a></td></tr>`,
 					i+1,
 					w.repo, digest, url.QueryEscape(mt), size, humanize.IBytes(uint64(size)),
-					i+1,
 					handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest),
 					downloadURL, html.EscapeString(downloadFilename), html.EscapeString(downloadFilename))
 			}

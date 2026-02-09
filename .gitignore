@@ -2,6 +2,6 @@
 dist/
 /pkg/forks/github.com
 cache/
-oci
+/oci
 *.exe
 *.code-workspace
