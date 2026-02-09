@@ -400,12 +400,15 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 		if strings.Contains(handler, "?") {
 			qs = "&"
 		}
-		w.Printf(`<a href="/%s%s@%s%smt=%s&size=%d" title="Config: %s"><img src="/eos-icons--init-container-outlined.png" alt="config" style="height:16px;vertical-align:middle"/></a>`,
+		w.Printf(`<a href="/%s%s@%s%smt=%s&size=%d" title="Config: %s"><img src="/eos-icons--init-container-outlined.png" alt="config" style="height:16px;vertical-align:middle"/></a> config`,
 			handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 	}
 
+	// Combined layers link with icon (same row as config)
+	w.Print(` <a href="/layers/` + image + `/"><img src="/f7--layers-alt-fill.png" alt="layers" style="height:16px;vertical-align:middle"/></a> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]`)
+
 	// Layers section with labels
-	w.Print(`<table><tr><td></td><td>[<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td><td></td></tr>`)
+	w.Print(`<table>`)
 	if layers, ok := m["layers"].([]interface{}); ok {
 		for i, l := range layers {
 			if layer, ok := l.(map[string]interface{}); ok {
