@@ -1557,7 +1557,6 @@ func (h *handler) getTags(repo name.Repository) ([]string, bool) {
 func (h *handler) manifestHeader(ref name.Reference, desc v1.Descriptor) *HeaderData {
 	header := headerData(ref, desc)
 	header.Referrers = true
-	header.DockerPull = ref.String()
 
 	identifiers := strings.TrimPrefix(ref.String(), ref.Context().String())
 

@@ -405,7 +405,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	}
 
 	// Layers section with labels
-	w.Print(`<table><tr><td colspan="2"><strong>[LIST VIEW] </strong></td><td colspan="2"><strong>[LAYERS VIEW] </strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td></tr>`)
+	w.Print(`<table><tr><td></td><td><strong>[LAYERS VIEW] </strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td><strong>[LIST VIEW]</strong></td><td></td></tr>`)
 	if layers, ok := m["layers"].([]interface{}); ok {
 		for i, l := range layers {
 			if layer, ok := l.(map[string]interface{}); ok {
@@ -433,10 +433,10 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				// Pass filename as query param so server can set correct Content-Disposition
 				downloadURL := fmt.Sprintf("/download/%s@%s?filename=%s", w.repo, digest, url.QueryEscape(downloadFilename))
 
-				w.Printf(`<tr><td>%d</td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s"><img src="/gis--layer-download.png" alt="Download" style="height:16px;vertical-align:middle"/></a></td></tr>`,
+				w.Printf(`<tr><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s"><img src="/gis--layer-download.png" alt="Download" style="height:16px;vertical-align:middle"/></a></td></tr>`,
 					i+1,
-					w.repo, digest, url.QueryEscape(mt), size, humanize.IBytes(uint64(size)),
 					handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest),
+					w.repo, digest, url.QueryEscape(mt), size, humanize.IBytes(uint64(size)),
 					downloadURL, html.EscapeString(downloadFilename), html.EscapeString(downloadFilename))
 			}
 		}
