@@ -591,6 +591,7 @@ func (h *handler) renderManifest(w http.ResponseWriter, r *http.Request, image s
 	}
 
 	header.SizeLink = fmt.Sprintf("/sizes/%s?mt=%s&size=%d", ref.Context().Digest(desc.Digest.String()).String(), desc.MediaType, desc.Size)
+	header.AbbreviatedMediaType = AbbreviateMediaType(string(desc.MediaType))
 
 	if err := bodyTmpl.Execute(w, header); err != nil {
 		return fmt.Errorf("bodyTmpl: %w", err)
