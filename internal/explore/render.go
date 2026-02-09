@@ -371,8 +371,8 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	filenameBase = strings.ReplaceAll(filenameBase, "/", "-")
 	filenameBase = strings.ReplaceAll(filenameBase, ":", "-")
 
-	// Config row (aligned with digest table above: label, size, sha256)
-	w.Print(`<table><tr><td><strong>CONFIG:</strong></td><td>`)
+	// Config row - just an icon linking to the config
+	w.Print(`<table><tr><td>`)
 	if cfg, ok := m["config"].(map[string]interface{}); ok {
 		digest := ""
 		size := int64(0)
@@ -391,8 +391,8 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 		if strings.Contains(handler, "?") {
 			qs = "&"
 		}
-		w.Printf(`%s</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a>`,
-			humanize.IBytes(uint64(size)), handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
+		w.Printf(`<a href="/%s%s@%s%smt=%s&size=%d" title="Config: %s"><img src="/eos-icons--init-container-outlined.png" alt="config" style="height:16px;vertical-align:middle"/></a>`,
+			handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 	}
 	w.Print(`</td></tr></table>`)
 

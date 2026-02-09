@@ -1,6 +1,7 @@
 package explore
 
 import (
+	"strings"
 	"text/template"
 
 	v1 "github.com/thesavant42/yolosint/pkg/forks/github.com/google/go-containerregistry/pkg/v1"
@@ -261,8 +262,7 @@ td:first-child {
 {{ end }}
 {{ if .Descriptor }}
 <table>
-<tr><td>mediaType</td><td colspan="2">{{.Descriptor.MediaType}}</td></tr>
-<tr><td>digest</td><td>{{if .SizeLink}}<a class="mt" href="{{.SizeLink}}">{{.Descriptor.Size}}</a>{{else}}{{.Descriptor.Size}}{{end}}</td><td><a class="mt" href="/{{.Handler}}{{$.Repo}}@{{.Descriptor.Digest}}{{.QuerySep}}{{if .EscapedMediaType}}mt={{.EscapedMediaType}}&{{end}}size={{.Descriptor.Size}}">{{.Descriptor.Digest}}</a></td></tr>
+<tr><td><img src="/ant-design--container-outlined.png" alt="manifest" style="height:16px;vertical-align:middle"/> {{.AbbreviatedMediaType}}</td></tr>
 {{if $.Subject}}<tr><td>OCI-Subject</td><td></td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr>{{end}}
 </table>
 {{end}}
@@ -296,21 +296,40 @@ type CosignTag struct {
 }
 
 type HeaderData struct {
-	Repo             string
-	CosignTags       []CosignTag
-	Reference        string
-	Up               *RepoParent
-	Descriptor       *v1.Descriptor
-	RefHandler       string
-	Handler          string
-	EscapedMediaType string
-	QuerySep         string
-	MediaTypeLink    string
-	SizeLink         string
-	HumanSize        string
-	Referrers        bool
-	Subject          string
-	SaveURL          string
-	Filename         string
-	DockerPull       string
+	Repo                 string
+	CosignTags           []CosignTag
+	Reference            string
+	Up                   *RepoParent
+	Descriptor           *v1.Descriptor
+	RefHandler           string
+	Handler              string
+	EscapedMediaType     string
+	QuerySep             string
+	MediaTypeLink        string
+	SizeLink             string
+	HumanSize            string
+	Referrers            bool
+	Subject              string
+	SaveURL              string
+	Filename             string
+	DockerPull           string
+	AbbreviatedMediaType string
+}
+
+// AbbreviateMediaType converts a full media type string to a short label
+func AbbreviateMediaType(mt string) string {
+	switch {
+	case strings.Contains(mt, "manifest.list"):
+		return "list v2"
+	case strings.Contains(mt, "image.index"):
+		return "index"
+	case strings.Contains(mt, "docker.distribution.manifest.v2"):
+		return "v2"
+	case strings.Contains(mt, "docker.distribution.manifest.v1"):
+		return "v1"
+	case strings.Contains(mt, "oci.image.manifest"):
+		return "OCI"
+	default:
+		return mt
+	}
 }
