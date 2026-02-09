@@ -405,7 +405,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	}
 
 	// Combined layers link with icon (same row as config)
-	w.Print(` <a href="/layers/` + image + `/"><img src="/f7--layers-alt-fill.png" alt="layers" style="height:16px;vertical-align:middle"/></a><a href="/layers/` + image + `/">combined layers view</a>`)
+	w.Print(` <a href="/layers/` + image + `/"><img src="/f7--layers-alt-fill.png" alt="layers" style="height:16px;vertical-align:middle"/></a><a href="/layers/` + image + `/"> combined layers view</a>`)
 
 	// Build history link with icon
 	historyUrl := *w.u
