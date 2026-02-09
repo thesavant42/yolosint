@@ -259,7 +259,6 @@ td:first-child {
 	<p><strong>{{.Reference}}</strong>{{ range .CosignTags }} (<a href="/?image={{$.Repo}}:{{.Tag}}">{{.Short}}</a>){{end}}{{if .Referrers}} <a href="/?referrers={{$.Repo}}@{{$.Descriptor.Digest}}">(referrers)</a>{{end}}</p>
 {{ end }}
 {{if .Subject}}<table><tr><td>OCI-Subject</td><td></td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr></table>{{end}}
-{{if .IsMergedView}}<p>Merged View --</p>{{else if .LayerIndex}}<p>Layer {{.LayerIndex}} <a href="{{.LayerDownloadURL}}"><img src="/gis--layer-download.png" alt="Download" style="height:16px;vertical-align:middle"/></a> <a href="{{.LayerDownloadURL}}">Download Layer</a></p>{{end}}
 {{if .Path}}<p>path: {{.Path}}</p>{{end}}
 {{if .Filename}}<h3>{{.Filename}}</h3>{{end}}
 </div>
@@ -309,9 +308,6 @@ type HeaderData struct {
 	Filename             string
 	AbbreviatedMediaType string
 	Path                 string
-	LayerIndex           int    // 1-based layer index (0 means not set)
-	LayerDownloadURL     string // download URL for this layer
-	IsMergedView         bool   // true when viewing merged layers
 }
 
 // AbbreviateMediaType converts a full media type string to a short label

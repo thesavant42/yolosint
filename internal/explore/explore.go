@@ -1733,16 +1733,6 @@ func renderHeader(w http.ResponseWriter, r *http.Request, fname string, prefix s
 	}
 	header.Path = currentPath
 
-	// Read layer index and download URL from query params
-	if layerStr := r.URL.Query().Get("layer"); layerStr != "" {
-		if layerIdx, err := strconv.Atoi(layerStr); err == nil {
-			header.LayerIndex = layerIdx
-		}
-	}
-	if dlurl := r.URL.Query().Get("dlurl"); dlurl != "" {
-		header.LayerDownloadURL = dlurl
-	}
-
 	// Add save link for files (not directories)
 	if !stat.IsDir() {
 		header.SaveURL = r.URL.Path + "?dl=1"
@@ -1842,9 +1832,6 @@ func renderDir(w http.ResponseWriter, fname string, prefix string, mediaType typ
 		currentPath = currentPath + "/"
 	}
 	header.Path = currentPath
-
-	// Mark this as merged view
-	header.IsMergedView = true
 
 	return bodyTmpl.Execute(w, header)
 }

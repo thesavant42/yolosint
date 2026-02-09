@@ -440,9 +440,9 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 				// Pass filename as query param so server can set correct Content-Disposition
 				downloadURL := fmt.Sprintf("/download/%s@%s?filename=%s", w.repo, digest, url.QueryEscape(downloadFilename))
 
-				w.Printf(`<tr><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d&layer=%d&dlurl=%s">%s</a></td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s"><img src="/gis--layer-download.png" alt="Download" style="height:16px;vertical-align:middle"/></a></td></tr>`,
+				w.Printf(`<tr><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td><td><a href="/size/%s@%s?mt=%s&size=%d">%s</a></td><td><a href="%s" download="%s" title="Download %s"><img src="/gis--layer-download.png" alt="Download" style="height:16px;vertical-align:middle"/></a></td></tr>`,
 					i+1,
-					handler, w.repo, digest, qs, url.QueryEscape(mt), size, i+1, url.QueryEscape(downloadURL), html.EscapeString(digest),
+					handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest),
 					w.repo, digest, url.QueryEscape(mt), size, humanize.IBytes(uint64(size)),
 					downloadURL, html.EscapeString(downloadFilename), html.EscapeString(downloadFilename))
 			}

@@ -43,9 +43,8 @@ Change to display layer info ABOVE the path:
 
 **WHY:** When the user is on the `/image?` view, they see a list of layers with their index numbers (1, 2, 3...) and download links. When they click a layer digest to browse its filesystem, that layer index information is currently LOST because the URL `/fs/repo@sha256:abc` has no layer context. We need to pass the layer index and download URL as query parameters so they survive the navigation.
 
-**WHAT:** In `renderManifestTables`, the layer links are generated at line 443. The `downloadURL` variable already exists at line 441 - this is the same download link currently shown next to each layer in the manifest view. We will pass it forward.
+**WHAT:** In `renderManifestTables`, the layer links are generated at line 443:
 
-Current code at line 443:
 ```go
 w.Printf(`<tr><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td>...`,
     i+1,
@@ -53,8 +52,13 @@ w.Printf(`<tr><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d">%s</a></td>...`,
     ...
 ```
 
-Change to include `layer` and `dlurl` query params:
+Change the `/fs/` link to include `layer` and `dlurl` query params:
+
 ```go
+// Build download URL for this layer (already exists at line 441)
+downloadURL := fmt.Sprintf("/download/%s@%s?filename=%s", w.repo, digest, url.QueryEscape(downloadFilename))
+
+// Add layer index and download URL to the /fs/ link
 w.Printf(`<tr><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d&layer=%d&dlurl=%s">%s</a></td>...`,
     i+1,
     handler, w.repo, digest, qs, url.QueryEscape(mt), size, i+1, url.QueryEscape(downloadURL), html.EscapeString(digest),
@@ -63,7 +67,7 @@ w.Printf(`<tr><td>%d</td><td><a href="/%s%s@%s%smt=%s&size=%d&layer=%d&dlurl=%s"
 
 ### 4. explore.go - Read layer params in renderHeader (line 1679)
 
-**WHY:** The `renderHeader` function is called when viewing a single layer's filesystem. It creates the `HeaderData` that gets passed to the template. We need to read the `layer` and `dlurl` query parameters that were added in step 3 and populate the new `HeaderData` fields so the template can render them.
+**WHY:** The `renderHeader` function is called when viewing a single layer's filesystem (e.g., `/fs/repo@sha256:abc/some/path`). It creates the `HeaderData` that gets passed to the template. We need to read the `layer` and `dlurl` query parameters that were added in step 3 and populate the new `HeaderData` fields so the template can render them.
 
 **WHAT:** After line 1734 where `header.Path` is set:
 
@@ -83,7 +87,7 @@ if dlurl := r.URL.Query().Get("dlurl"); dlurl != "" {
 
 ### 5. explore.go - Set IsMergedView in renderDir (line 1773)
 
-**WHY:** The `renderDir` function is called when viewing the merged/combined layers view. Per the requirements, the merged view should show "Merged View --" instead of a layer number and download link. We need to set a flag so the template knows to render the merged view text.
+**WHY:** The `renderDir` function is called when viewing the merged/combined layers view (e.g., `/layers/repo:tag/`). This is different from viewing a single layer. Per the requirements, the merged view should show "Merged View --" instead of a layer number and download link. We need to set a flag so the template knows to render the merged view text.
 
 **WHAT:** After line 1834 where `header.Path` is set:
 
@@ -94,50 +98,18 @@ header.Path = currentPath
 header.IsMergedView = true
 ```
 
-## Data Flow Example
+## Data Flow
 
-### Single Layer View
+### Single Layer View:
+1. User views manifest at `/?image=ubuntu:latest`
+2. `renderManifestTables` generates layer list with links like `/fs/repo@sha256:abc?layer=3&dlurl=/download/repo@sha256:abc?filename=...`
+3. User clicks layer 3
+4. `renderHeader` reads `layer=3` and `dlurl=...` from query params, sets `header.LayerIndex=3` and `header.LayerDownloadURL=...`
+5. `bodyTemplate` renders "Layer 3 [icon] Download Layer" above the path
 
-**Starting point:** User is viewing `/?image=cgr.dev/chainguard/static:latest`
-
-The manifest view shows a table of layers:
-
-| # | Digest | Size | Download |
-|---|--------|------|----------|
-| 1 | sha256:abc123... | 2.1 MiB | [icon] |
-| 2 | sha256:def456... | 1.5 MiB | [icon] |
-| 3 | sha256:789xyz... | 500 KiB | [icon] |
-
-**Current behavior:** Clicking layer 2's digest links to:
-```
-/fs/cgr.dev/chainguard/static@sha256:def456...?mt=...&size=...
-```
-The layer number (2) is lost.
-
-**New behavior:** Clicking layer 2's digest links to:
-```
-/fs/cgr.dev/chainguard/static@sha256:def456...?mt=...&size=...&layer=2&dlurl=%2Fdownload%2F...
-```
-The layer number (2) and the download URL are preserved in the query string.
-
-When the filesystem view renders, it reads `layer=2` and displays:
-```
-Layer 2 [download-icon] Download Layer
-path: /
-```
-
-### Merged View
-
-**Starting point:** User clicks "combined layers view" from manifest page
-
-User navigates to `/layers/cgr.dev/chainguard/static:latest/`
-
-The `renderDir` function handles this view and sets `IsMergedView=true`.
-
-The template displays:
-```
-Merged View --
-path: /
-```
-
-No download link is shown because merged view represents all layers combined.
+### Merged View:
+1. User views manifest at `/?image=ubuntu:latest`
+2. User clicks "combined layers view" link to `/layers/ubuntu:latest/`
+3. User navigates merged filesystem
+4. `renderDir` sets `header.IsMergedView=true`
+5. `bodyTemplate` renders "Merged View --" (no download link since this is merged)
