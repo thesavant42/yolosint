@@ -261,10 +261,8 @@ td:first-child {
 {{if .DockerPull}}<p><span style="background:#2a2a3e;padding:4px 8px;border-radius:4px;border:1px solid #444;">docker pull {{.DockerPull}} <button onclick="navigator.clipboard.writeText('docker pull {{.DockerPull}}')" style="background:#444;color:inherit;border:1px solid #666;padding:2px 6px;border-radius:4px;cursor:pointer;margin-left:4px;font:inherit;">Copy</button></span></p>{{end}}
 {{ end }}
 {{ if .Descriptor }}
-<table>
-<tr><td><img src="/ant-design--container-outlined.png" alt="manifest" style="height:16px;vertical-align:middle"/> {{.AbbreviatedMediaType}}</td></tr>
-{{if $.Subject}}<tr><td>OCI-Subject</td><td></td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr>{{end}}
-</table>
+<img src="/ant-design--container-outlined.png" alt="manifest" style="height:16px;vertical-align:middle"/> {{.AbbreviatedMediaType}}
+{{if $.Subject}}<table><tr><td>OCI-Subject</td><td></td><td><a class="mt" href="/?image={{$.Repo}}@{{.Subject}}">{{.Subject}}</a></td></tr></table>{{end}}
 {{end}}
 {{if .Filename}}<h3>{{.Filename}}</h3>{{end}}
 </div>

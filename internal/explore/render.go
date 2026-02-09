@@ -371,8 +371,7 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 	filenameBase = strings.ReplaceAll(filenameBase, "/", "-")
 	filenameBase = strings.ReplaceAll(filenameBase, ":", "-")
 
-	// Config row - just an icon linking to the config
-	w.Print(`<table><tr><td>`)
+	// Config icon - inline next to manifest icon
 	if cfg, ok := m["config"].(map[string]interface{}); ok {
 		digest := ""
 		size := int64(0)
@@ -394,7 +393,6 @@ func renderManifestTables(w *jsonOutputter, m map[string]interface{}) error {
 		w.Printf(`<a href="/%s%s@%s%smt=%s&size=%d" title="Config: %s"><img src="/eos-icons--init-container-outlined.png" alt="config" style="height:16px;vertical-align:middle"/></a>`,
 			handler, w.repo, digest, qs, url.QueryEscape(mt), size, html.EscapeString(digest))
 	}
-	w.Print(`</td></tr></table>`)
 
 	// Layers section with labels
 	w.Print(`<table><tr><td colspan="2"><strong>[LIST VIEW] </strong></td><td colspan="2"><strong>[LAYERS VIEW] </strong> [<a href="/layers/` + image + `/">COMBINED LAYERS VIEW</a>]</td><td></td></tr>`)
