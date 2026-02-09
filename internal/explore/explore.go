@@ -202,6 +202,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 		return
 	}
+	if r.URL.Path == "/gis--layer-download.png" {
+		w.Header().Set("Cache-Control", "max-age=3600")
+		data, _ := Assets.ReadFile("assets/gis--layer-download.png")
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(data)
+		return
+	}
 	if r.URL.Path == "/robots.txt" {
 		w.Header().Set("Cache-Control", "max-age=3600")
 		data, _ := Assets.ReadFile("assets/robots.txt")
