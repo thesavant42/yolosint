@@ -27,6 +27,32 @@ func indexKey(prefix string, idx int) string {
 	return fmt.Sprintf("%s.%d", prefix, idx)
 }
 
+// extractImageContext extracts searchable metadata from a name.Digest reference
+func extractImageContext(dig name.Digest) *ImageContext {
+	ctx := dig.Context()
+	repoStr := ctx.RepositoryStr()
+
+	// Parse namespace and repository from path
+	// e.g., "chainguard/nginx" -> namespace="chainguard", repo="nginx"
+	// e.g., "library/nginx" -> namespace="library", repo="nginx"
+	// e.g., "nginx" -> namespace="", repo="nginx"
+	parts := strings.SplitN(repoStr, "/", 2)
+	namespace := ""
+	repository := repoStr
+	if len(parts) == 2 {
+		namespace = parts[0]
+		repository = parts[1]
+	}
+
+	return &ImageContext{
+		Registry:   ctx.RegistryStr(),
+		Namespace:  namespace,
+		Repository: repository,
+		Tag:        "", // Tag not available from Digest reference
+		ImageRef:   ctx.String(),
+	}
+}
+
 // Attempt to create a new index. If we fail, both readclosers will be nil.
 // TODO: Dedupe with createIndex.
 func (h *handler) tryNewIndex(w http.ResponseWriter, r *http.Request, dig name.Digest, ref string, blob *sizeBlob) (string, io.ReadCloser, io.ReadCloser, error) {
@@ -80,8 +106,12 @@ func (h *handler) tryNewIndex(w http.ResponseWriter, r *http.Request, dig name.D
 		}
 
 		// Set callback to log TOC to SQLite when it's written
+		// Extract image context for searchable metadata
+		imgCtx := extractImageContext(dig)
 		idx.Key = key
-		idx.OnTOC = h.logTOC
+		idx.OnTOC = func(k string, t *soci.TOC) {
+			h.logTOC(k, t, imgCtx)
+		}
 
 		indexer = idx
 		tr = idx
@@ -243,8 +273,12 @@ func (h *handler) createIndex(ctx context.Context, rc io.ReadCloser, size int64,
 	}
 
 	// Set callback to log TOC to SQLite when it's written
+	// Note: createIndex is used for nested indexes (index-of-index) which don't have
+	// the original image reference context, so we pass nil for ImageContext
 	indexer.Key = key
-	indexer.OnTOC = h.logTOC
+	indexer.OnTOC = func(k string, t *soci.TOC) {
+		h.logTOC(k, t, nil)
+	}
 
 	for {
 		// Make sure we hit the end.

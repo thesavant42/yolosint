@@ -13,6 +13,15 @@ import (
 	"github.com/thesavant42/yolosint/internal/soci"
 )
 
+// ImageContext holds the parsed image reference metadata for searchable logging
+type ImageContext struct {
+	Registry   string // e.g., ghcr.io, docker.io
+	Namespace  string // e.g., chainguard, library (first path segment)
+	Repository string // e.g., nginx, go (remaining path after namespace)
+	Tag        string // e.g., latest, v1.0.0 (may be empty for digest refs)
+	ImageRef   string // full reference: ghcr.io/chainguard/nginx:latest
+}
+
 type TocDB struct {
 	db   *sql.DB
 	mu   sync.Mutex
@@ -65,30 +74,49 @@ func (t *TocDB) init() error {
 		log.Printf("[DB] init: sql.Open succeeded")
 
 		schema := `
-        CREATE TABLE IF NOT EXISTS layers (
-            id INTEGER PRIMARY KEY,
-            digest TEXT NOT NULL,
-            csize INTEGER,
-            usize INTEGER,
-            type TEXT,
-            media_type TEXT,
-            indexed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-        CREATE TABLE IF NOT EXISTS files (
-            id INTEGER PRIMARY KEY,
-            layer_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            typeflag INTEGER,
-            size INTEGER,
-            mode INTEGER,
-            mod DATETIME,
-            offset INTEGER,
-            linkname TEXT,
-            FOREIGN KEY(layer_id) REFERENCES layers(id)
-        );
-        CREATE INDEX IF NOT EXISTS idx_files_name ON files(name);
-        CREATE INDEX IF NOT EXISTS idx_layers_digest ON layers(digest);
-        `
+		      CREATE TABLE IF NOT EXISTS layers (
+		          id INTEGER PRIMARY KEY,
+		          digest TEXT NOT NULL,
+		          csize INTEGER,
+		          usize INTEGER,
+		          type TEXT,
+		          media_type TEXT,
+		          indexed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		          registry TEXT,
+		          namespace TEXT,
+		          repository TEXT,
+		          tag TEXT,
+		          image_ref TEXT
+		      );
+		      CREATE TABLE IF NOT EXISTS files (
+		          id INTEGER PRIMARY KEY,
+		          layer_id INTEGER NOT NULL,
+		          name TEXT NOT NULL,
+		          typeflag INTEGER,
+		          size INTEGER,
+		          mode INTEGER,
+		          mod DATETIME,
+		          offset INTEGER,
+		          linkname TEXT,
+		          FOREIGN KEY(layer_id) REFERENCES layers(id)
+		      );
+		      CREATE INDEX IF NOT EXISTS idx_files_name ON files(name);
+		      CREATE INDEX IF NOT EXISTS idx_layers_digest ON layers(digest);
+		      CREATE INDEX IF NOT EXISTS idx_layers_registry ON layers(registry);
+		      CREATE INDEX IF NOT EXISTS idx_layers_namespace ON layers(namespace);
+		      CREATE INDEX IF NOT EXISTS idx_layers_repository ON layers(repository);
+		      CREATE INDEX IF NOT EXISTS idx_layers_image_ref ON layers(image_ref);
+		      `
+
+		// Migration for existing databases: add new columns if they don't exist
+		migration := `
+		      ALTER TABLE layers ADD COLUMN registry TEXT;
+		      ALTER TABLE layers ADD COLUMN namespace TEXT;
+		      ALTER TABLE layers ADD COLUMN repository TEXT;
+		      ALTER TABLE layers ADD COLUMN tag TEXT;
+		      ALTER TABLE layers ADD COLUMN image_ref TEXT;
+		      `
+		_ = migration // Used only for documentation; SQLite doesn't support ADD COLUMN IF NOT EXISTS
 
 		log.Printf("[DB] init: executing schema")
 		if _, err := db.Exec(schema); err != nil {
@@ -112,7 +140,7 @@ func (t *TocDB) init() error {
 	return t.err
 }
 
-func (t *TocDB) Insert(digest string, toc *soci.TOC) error {
+func (t *TocDB) Insert(digest string, toc *soci.TOC, imgCtx *ImageContext) error {
 	log.Printf("[DB] Insert: called for digest=%s", digest)
 	if err := t.init(); err != nil {
 		log.Printf("[DB] Insert: init failed, err=%v", err)
@@ -129,9 +157,29 @@ func (t *TocDB) Insert(digest string, toc *soci.TOC) error {
 	}
 	defer tx.Rollback()
 
+	// Handle nil ImageContext gracefully
+	var registry, namespace, repository, tag, imageRef *string
+	if imgCtx != nil {
+		if imgCtx.Registry != "" {
+			registry = &imgCtx.Registry
+		}
+		if imgCtx.Namespace != "" {
+			namespace = &imgCtx.Namespace
+		}
+		if imgCtx.Repository != "" {
+			repository = &imgCtx.Repository
+		}
+		if imgCtx.Tag != "" {
+			tag = &imgCtx.Tag
+		}
+		if imgCtx.ImageRef != "" {
+			imageRef = &imgCtx.ImageRef
+		}
+	}
+
 	res, err := tx.Exec(
-		`INSERT INTO layers (digest, csize, usize, type, media_type) VALUES (?, ?, ?, ?, ?)`,
-		digest, toc.Csize, toc.Usize, toc.Type, toc.MediaType,
+		`INSERT INTO layers (digest, csize, usize, type, media_type, registry, namespace, repository, tag, image_ref) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		digest, toc.Csize, toc.Usize, toc.Type, toc.MediaType, registry, namespace, repository, tag, imageRef,
 	)
 	if err != nil {
 		return err

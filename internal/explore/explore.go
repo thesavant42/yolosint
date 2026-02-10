@@ -147,9 +147,9 @@ func New(opts ...Option) http.Handler {
 }
 
 // logTOC is the callback for Indexer.OnTOC - logs TOC data to SQLite
-func (h *handler) logTOC(key string, toc *soci.TOC) {
+func (h *handler) logTOC(key string, toc *soci.TOC, imgCtx *ImageContext) {
 	if h.tocDB != nil {
-		if err := h.tocDB.Insert(key, toc); err != nil {
+		if err := h.tocDB.Insert(key, toc, imgCtx); err != nil {
 			log.Printf("SQLite insert failed for %s: %v", key, err)
 		}
 	}
