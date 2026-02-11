@@ -108,16 +108,6 @@ func (t *TocDB) init() error {
 		      CREATE INDEX IF NOT EXISTS idx_layers_image_ref ON layers(image_ref);
 		      `
 
-		// Migration for existing databases: add new columns if they don't exist
-		migration := `
-		      ALTER TABLE layers ADD COLUMN registry TEXT;
-		      ALTER TABLE layers ADD COLUMN namespace TEXT;
-		      ALTER TABLE layers ADD COLUMN repository TEXT;
-		      ALTER TABLE layers ADD COLUMN tag TEXT;
-		      ALTER TABLE layers ADD COLUMN image_ref TEXT;
-		      `
-		_ = migration // Used only for documentation; SQLite doesn't support ADD COLUMN IF NOT EXISTS
-
 		log.Printf("[DB] init: executing schema")
 		if _, err := db.Exec(schema); err != nil {
 			log.Printf("[DB] init: schema exec failed, err=%v", err)
